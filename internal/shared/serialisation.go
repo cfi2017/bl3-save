@@ -40,3 +40,25 @@ func DeserializeHeader(reader io.Reader) (SavFile, []byte) {
 	return s, data
 }
 
+func SerializeHeader(writer io.Writer, s SavFile, content []byte) {
+
+	w := bufio.NewWriter(writer)
+	WriteBytes(w, []byte("GVAS"))
+	WriteInt(w, s.SgVersion)
+	WriteInt(w, s.PkgVersion)
+	WriteShort(w, s.EngineMajorVersion)
+	WriteShort(w, s.EngineMinorVersion)
+	WriteShort(w, s.EnginePatchVersion)
+	WriteInt(w, s.EngineBuildVersion)
+	WriteString(w, s.BuildId)
+	WriteInt(w, s.FmtVersion)
+	WriteInt(w, len(s.CustomFmtData))
+	for _, d := range s.CustomFmtData {
+		WriteGuid(w, d.Guid)
+		WriteInt(w, d.Entry)
+	}
+	WriteString(w, s.SgType)
+
+	WriteInt(w, len(content))
+	WriteBytes(w, content)
+}

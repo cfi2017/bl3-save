@@ -36,3 +36,13 @@ func Deserialize(reader io.Reader) (shared.SavFile, pb.Character) {
 
 	return s, p
 }
+
+func Serialize(writer io.Writer, s shared.SavFile, p pb.Character) {
+	bs, err := proto.Marshal(&p)
+	if err != nil {
+		panic(err)
+	}
+	bs = shared.Encrypt(bs, prefixMagic, xorMagic)
+	shared.SerializeHeader(writer, s, bs)
+
+}

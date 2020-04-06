@@ -1,7 +1,6 @@
 package profile
 
 import (
-	"bufio"
 	"io"
 
 	"github.com/cfi2017/bl3-save/internal/pb"
@@ -40,31 +39,11 @@ func Deserialize(reader io.Reader) (shared.SavFile, pb.Profile) {
 }
 
 func Serialize(writer io.Writer, s shared.SavFile, p pb.Profile) {
-	w := bufio.NewWriter(writer)
-	shared.WriteBytes(w, []byte("GVAS"))
-	shared.WriteInt(w, s.SgVersion)
-	shared.WriteInt(w, s.PkgVersion)
-	shared.WriteShort(w, s.EngineMajorVersion)
-	shared.WriteShort(w, s.EngineMinorVersion)
-	shared.WriteShort(w, s.EnginePatchVersion)
-	shared.WriteInt(w, s.EngineBuildVersion)
-	shared.WriteString(w, s.BuildId)
-	shared.WriteInt(w, s.FmtVersion)
-	shared.WriteInt(w, len(s.CustomFmtData))
-	for _, d := range s.CustomFmtData {
-		shared.WriteGuid(w, d.Guid)
-		shared.WriteInt(w, d.Entry)
-	}
-	shared.WriteString(w, s.SgType)
-
 	bs, err := proto.Marshal(&p)
 	if err != nil {
 		panic(err)
 	}
-
 	bs = shared.Encrypt(bs, prefixMagic, xorMagic)
-
-	shared.WriteInt(w, len(bs))
-	shared.WriteBytes(w, bs)
+	shared.SerializeHeader(writer, s, bs)
 
 }
