@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/cfi2017/bl3-save/internal/character"
 	"github.com/cfi2017/bl3-save/internal/pb"
 	"github.com/cfi2017/bl3-save/internal/profile"
-	"github.com/cfi2017/bl3-save/internal/save"
 	"github.com/cfi2017/bl3-save/internal/shared"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -76,7 +76,7 @@ Override with --format <profile|character>
 			}
 			fmt.Print(string(bs))
 		} else {
-			s, c := save.Deserialize(f)
+			s, c := character.Deserialize(f)
 			r := struct {
 				Sav       shared.SavFile
 				Character pb.Character

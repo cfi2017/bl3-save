@@ -47,12 +47,13 @@ func ReadString(r io.Reader) string {
 		return ""
 	}
 	bs := ReadNBytes(r, l)
-	return string(bs)
+	// trim last byte (0-byte)
+	return string(bs[:len(bs)-1])
 }
 
 func WriteString(w io.Writer, s string) {
-	WriteInt(w, len(s))
-	bs := []byte(s)
+	WriteInt(w, len(s)+1)
+	bs := append([]byte(s), 0x00)
 	WriteBytes(w, bs)
 }
 
