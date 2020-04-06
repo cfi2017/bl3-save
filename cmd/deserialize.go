@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	json "encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -26,13 +25,15 @@ import (
 	"github.com/cfi2017/bl3-save/internal/save"
 	"github.com/cfi2017/bl3-save/internal/shared"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 )
 
 var (
-	format    string
-	isProfile bool
+	format       string
+	isProfile    bool
 	outputFormat string
 )
+
 // deserializeCmd represents the deserialize command
 var deserializeCmd = &cobra.Command{
 	Use:   "deserialize",
@@ -66,10 +67,10 @@ Override with --format <profile|character>
 		if isProfile {
 			s, p := profile.Deserialize(f)
 			r := struct {
-				Sav shared.SavFile
+				Sav     shared.SavFile
 				Profile pb.Profile
-			}{s, p,}
-			bs, err := json.Marshal(r)
+			}{s, p}
+			bs, err := yaml.Marshal(r)
 			if err != nil {
 				panic(err)
 			}
@@ -77,10 +78,10 @@ Override with --format <profile|character>
 		} else {
 			s, c := save.Deserialize(f)
 			r := struct {
-				Sav shared.SavFile
+				Sav       shared.SavFile
 				Character pb.Character
-			}{s, c,}
-			bs, err := json.Marshal(r)
+			}{s, c}
+			bs, err := yaml.Marshal(r)
 			if err != nil {
 				panic(err)
 			}

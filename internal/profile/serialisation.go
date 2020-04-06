@@ -6,7 +6,7 @@ import (
 
 	"github.com/cfi2017/bl3-save/internal/pb"
 	"github.com/cfi2017/bl3-save/internal/shared"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 )
 
 func Deserialize(reader io.Reader) (shared.SavFile, pb.Profile) {
@@ -26,5 +26,5 @@ func Deserialize(reader io.Reader) (shared.SavFile, pb.Profile) {
 
 func Serialize(writer io.Writer, s shared.SavFile, p pb.Profile) {
 	w := bufio.NewWriter(writer)
-	w.WriteString("GVAS")
+	shared.WriteString(w, "GVAS")
 }
