@@ -1,3 +1,6 @@
+[![GoDoc](https://godoc.org/github.com/cfi2017/bl3-save?status.svg)](https://godoc.org/github.com/cfi2017/bl3-save)
+[![Go Report Card](https://goreportcard.com/badge/github.com/cfi2017/bl3-save)](https://goreportcard.com/report/github.com/cfi2017/bl3-save)
+
 # bl3-save
 
 Command line utility for modifying borderlands 3 character and profile saves.
