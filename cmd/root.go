@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/cfi2017/bl3-save/internal/server"
+	"github.com/cfi2017/bl3-save/internal/shared"
 	"github.com/spf13/cobra"
 
 	"github.com/mitchellh/go-homedir"
@@ -39,7 +41,12 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		shared.OpenBrowser("https://bl3.swiss.dev/")
+		if err := server.Start(); err != nil {
+			panic(err)
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

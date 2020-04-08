@@ -1,6 +1,12 @@
 package shared
 
-import "strings"
+import (
+	"fmt"
+	"log"
+	"os/exec"
+	"runtime"
+	"strings"
+)
 
 func GuessIsProfileSav(name string) bool {
 	parts := strings.Split(name, "/")
@@ -9,4 +15,23 @@ func GuessIsProfileSav(name string) bool {
 		return true
 	}
 	return false
+}
+
+func OpenBrowser(url string) {
+	var err error
+
+	switch runtime.GOOS {
+	case "linux":
+		err = exec.Command("xdg-open", url).Start()
+	case "windows":
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		err = exec.Command("open", url).Start()
+	default:
+		err = fmt.Errorf("unsupported platform")
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
