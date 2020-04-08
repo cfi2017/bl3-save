@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/cfi2017/bl3-save/internal/pb"
-	"github.com/cfi2017/bl3-save/internal/profile"
+	profile2 "github.com/cfi2017/bl3-save/pkg/profile"
 	"github.com/spf13/cobra"
 )
 
@@ -41,7 +41,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		s, p := profile.Deserialize(in)
+		s, p := profile2.Deserialize(in)
 		err = in.Close()
 		if err != nil {
 			return err
@@ -66,7 +66,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		profile.Serialize(out, s, p)
+		profile2.Serialize(out, s, p)
 		err = out.Close()
 		if err != nil {
 			return err
