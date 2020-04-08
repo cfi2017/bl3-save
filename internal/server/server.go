@@ -17,7 +17,9 @@ func init() {
 }
 
 func Start() error {
-	r := gin.Default()
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+	r.Use(gin.LoggerWithWriter(os.Stderr, "/stats"), gin.Recovery())
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"https://bl3.swiss.dev", "http://localhost:4200"},
@@ -28,7 +30,7 @@ func Start() error {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	r.GET("/", func(c *gin.Context) {
+	r.GET("/stats", func(c *gin.Context) {
 		c.JSON(200, &struct {
 			Pwd string `json:"pwd"`
 		}{
