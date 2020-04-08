@@ -15,8 +15,12 @@ limitations under the License.
 */
 package main
 
-import "github.com/cfi2017/bl3-save/cmd"
+import (
+	"github.com/cfi2017/bl3-save/cmd"
+	"github.com/spf13/cobra"
+)
 
 func main() {
+	cobra.MousetrapHelpText = ""
 	cmd.Execute()
 }
