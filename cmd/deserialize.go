@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cfi2017/bl3-save/internal/pb"
 	"github.com/cfi2017/bl3-save/internal/shared"
 	character2 "github.com/cfi2017/bl3-save/pkg/character"
+	"github.com/cfi2017/bl3-save/pkg/pb"
 	profile2 "github.com/cfi2017/bl3-save/pkg/profile"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"

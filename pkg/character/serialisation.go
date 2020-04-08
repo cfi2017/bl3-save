@@ -3,8 +3,8 @@ package character
 import (
 	"io"
 
-	"github.com/cfi2017/bl3-save/internal/pb"
 	"github.com/cfi2017/bl3-save/internal/shared"
+	"github.com/cfi2017/bl3-save/pkg/pb"
 	"google.golang.org/protobuf/proto"
 )
 
