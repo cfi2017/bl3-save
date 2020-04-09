@@ -51,7 +51,7 @@ func getCharacter(c *gin.Context) {
 
 	// workaround for invalid json parsing values
 	for _, d := range char.GbxZoneMapFodSaveGameData.LevelData {
-		if *d.DiscoveryPercentage > math.MaxFloat32 {
+		if d.DiscoveryPercentage != nil && *d.DiscoveryPercentage > math.MaxFloat32 {
 			*d.DiscoveryPercentage = -1
 		}
 	}
@@ -77,7 +77,7 @@ func updateCharacter(c *gin.Context) {
 	}
 	// workaround for invalid json parsing values
 	for _, d := range d.Character.GbxZoneMapFodSaveGameData.LevelData {
-		if *d.DiscoveryPercentage == -1 {
+		if d.DiscoveryPercentage != nil && *d.DiscoveryPercentage == -1 {
 			*d.DiscoveryPercentage = math.Float32frombits(0x7F800000) // inf
 		}
 	}
