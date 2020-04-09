@@ -53,9 +53,9 @@ func Start() error {
 	r.GET("/profile", getProfile)
 	r.POST("/profile", updateProfile)
 
-	r.GET("/characters", ListCharacters)
-	r.GET("/characters/:id")
-	r.POST("/characters/:id")
+	r.GET("/characters", listCharacters)
+	r.GET("/characters/:id", getCharacter)
+	r.POST("/characters/:id", updateCharacter)
 
 	return r.Run(":5050")
 }

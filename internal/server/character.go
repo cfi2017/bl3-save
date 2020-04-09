@@ -6,7 +6,9 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/cfi2017/bl3-save/internal/shared"
 	"github.com/cfi2017/bl3-save/pkg/character"
+	"github.com/cfi2017/bl3-save/pkg/pb"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +16,7 @@ var (
 	charPattern = regexp.MustCompile("(\\d+)\\.sav")
 )
 
-func ListCharacters(c *gin.Context) {
+func listCharacters(c *gin.Context) {
 	files, err := ioutil.ReadDir(pwd)
 	if err != nil {
 		c.AbortWithStatus(500)
@@ -33,6 +35,46 @@ func ListCharacters(c *gin.Context) {
 	}
 	c.JSON(200, &characters)
 
+}
+
+func getCharacter(c *gin.Context) {
+	id := c.Param("id")
+
+	f, err := os.Open(pwd + "/" + id + ".sav")
+	if err != nil {
+		c.AbortWithStatus(500)
+		return
+	}
+	defer f.Close()
+	s, char := character.Deserialize(f)
+	c.JSON(200, struct {
+		Save      shared.SavFile `json:"save"`
+		Character pb.Character   `json:"character"`
+	}{Save: s, Character: char})
+
+}
+
+func updateCharacter(c *gin.Context) {
+	id := c.Param("id")
+
+	var d struct {
+		Save      shared.SavFile `json:"save"`
+		Character pb.Character   `json:"character"`
+	}
+	err := c.BindJSON(&d)
+	if err != nil {
+		c.AbortWithStatus(500)
+		return
+	}
+	f, err := os.Create(pwd + "/" + id + ".sav")
+	if err != nil {
+		c.AbortWithStatus(500)
+		return
+	}
+	defer f.Close()
+	character.Serialize(f, d.Save, d.Character)
+	c.Status(204)
+	return
 }
 
 type CharInfo struct {
