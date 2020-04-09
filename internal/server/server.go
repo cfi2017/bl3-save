@@ -31,10 +31,13 @@ func Start() error {
 	}))
 
 	r.GET("/stats", func(c *gin.Context) {
+		_, err := os.Stat(pwd + "/profile.sav")
 		c.JSON(200, &struct {
-			Pwd string `json:"pwd"`
+			Pwd        string `json:"pwd"`
+			HasProfile bool   `json:"hasProfile"`
 		}{
-			Pwd: pwd,
+			Pwd:        pwd,
+			HasProfile: err == nil && !os.IsNotExist(err),
 		})
 	})
 
