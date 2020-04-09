@@ -2,6 +2,7 @@ package server
 
 import (
 	"io/ioutil"
+	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -47,7 +48,15 @@ func getCharacter(c *gin.Context) {
 	}
 	defer f.Close()
 	s, char := character.Deserialize(f)
-	c.JSON(200, struct {
+
+	// workaround for invalid json parsing values
+	for _, d := range char.GbxZoneMapFodSaveGameData.LevelData {
+		if *d.DiscoveryPercentage > math.MaxFloat32 {
+			*d.DiscoveryPercentage = -1
+		}
+	}
+
+	c.JSON(200, &struct {
 		Save      shared.SavFile `json:"save"`
 		Character pb.Character   `json:"character"`
 	}{Save: s, Character: char})
@@ -65,6 +74,12 @@ func updateCharacter(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatus(500)
 		return
+	}
+	// workaround for invalid json parsing values
+	for _, d := range d.Character.GbxZoneMapFodSaveGameData.LevelData {
+		if *d.DiscoveryPercentage == -1 {
+			*d.DiscoveryPercentage = math.Float32frombits(0x7F800000) // inf
+		}
 	}
 	f, err := os.Create(pwd + "/" + id + ".sav")
 	if err != nil {
