@@ -2,6 +2,7 @@ package server
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -24,7 +25,7 @@ func Start() error {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"https://bl3.swiss.dev", "http://localhost:4200"},
 		AllowMethods:     []string{"GET", "POST"},
-		AllowHeaders:     []string{"Origin"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: false,
 		MaxAge:           12 * time.Hour,
@@ -42,12 +43,14 @@ func Start() error {
 	})
 
 	r.POST("/cd", func(c *gin.Context) {
-		var body struct{ path string }
-		err := c.BindJSON(&body)
+		var body struct {
+			Pwd string `json:"pwd" binding:"required"`
+		}
+		err := c.Bind(&body)
 		if err != nil {
 			return
 		}
-		pwd = body.path
+		pwd = strings.TrimSuffix(body.Pwd, "/")
 		c.JSON(200, struct {
 			Pwd string `json:"pwd"`
 		}{Pwd: pwd})
