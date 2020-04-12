@@ -1,7 +1,9 @@
 package server
 
 import (
+	"encoding/base64"
 	"io/ioutil"
+	"log"
 	"math"
 	"os"
 	"regexp"
@@ -126,17 +128,21 @@ func getItems(c *gin.Context) {
 		c.AbortWithStatus(500)
 	}
 	_, char := character.Deserialize(f)
-	items := make([]item.Item, len(char.InventoryItems))
+	items := make([]item.Item, 0)
 	for _, data := range char.InventoryItems {
-		i, err := item.Deserialize(data.ItemSerialNumber)
+		d := make([]byte, len(data.ItemSerialNumber))
+		copy(d, data.ItemSerialNumber)
+		i, err := item.Deserialize(d)
 		if err != nil {
-			c.AbortWithStatus(500)
-			return
+			log.Println(err)
+			log.Println(base64.StdEncoding.EncodeToString(data.ItemSerialNumber))
+			// c.AbortWithStatus(500)
+			// return
 		}
 		i.Wrapper = data
 		items = append(items, i)
 	}
-	c.JSON(200, items)
+	c.JSON(200, &items)
 	return
 }
 

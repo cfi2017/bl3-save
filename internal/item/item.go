@@ -2,13 +2,11 @@ package item
 
 import (
 	"encoding/binary"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"hash/crc32"
 	"io/ioutil"
-	"log"
 	"strings"
 	"sync"
 
@@ -22,15 +20,15 @@ var (
 )
 
 type Item struct {
-	Level        int
-	Balance      string
-	Manufacturer string
-	InvData      string
-	Parts        []string
-	Generics     []string
-	Overflow     string
-	Version      uint64
-	Wrapper      *pb.OakInventoryItemSaveGameData
+	Level        int                              `json:"level"`
+	Balance      string                           `json:"balance"`
+	Manufacturer string                           `json:"manufacturer"`
+	InvData      string                           `json:"inv_data"`
+	Parts        []string                         `json:"parts"`
+	Generics     []string                         `json:"generics"`
+	Overflow     string                           `json:"overflow"`
+	Version      uint64                           `json:"version"`
+	Wrapper      *pb.OakInventoryItemSaveGameData `json:"wrapper"`
 }
 
 func DecryptSerial(data []byte) ([]byte, error) {
@@ -44,7 +42,6 @@ func DecryptSerial(data []byte) ([]byte, error) {
 	decrypted := bogoDecrypt(seed, data[5:])
 	crc := binary.BigEndian.Uint16(decrypted)                          // first two bytes of decrypted data are crc checksum
 	combined := append(append(data[:5], 0xFF, 0xFF), decrypted[2:]...) // combined data with checksum replaced with 0xFF to compute checksum
-	log.Println(hex.EncodeToString(combined))
 	computedChecksum := crc32.ChecksumIEEE(combined)
 	check := uint16(((computedChecksum) >> 16) ^ ((computedChecksum & 0xFFFF) >> 0))
 
@@ -151,6 +148,9 @@ func getBits(k string, v uint64) int {
 
 func getPart(key string, index uint64) string {
 	data := db.GetData(key)
+	if int(index) >= len(data.Assets) {
+		return ""
+	}
 	return data.GetPart(index)
 }
 
