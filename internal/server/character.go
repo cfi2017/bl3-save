@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"io/ioutil"
 	"math"
 	"os"
@@ -38,10 +39,14 @@ func listCharacters(c *gin.Context) {
 
 }
 
-func getCharacter(c *gin.Context) {
+func getSaveById(id string) (*os.File, error) {
+	return os.Open(pwd + "/" + id + ".sav")
+}
+
+func getCharacterRequest(c *gin.Context) {
 	id := c.Param("id")
 
-	f, err := os.Open(pwd + "/" + id + ".sav")
+	f, err := getSaveById(id)
 	if err != nil {
 		c.AbortWithStatus(500)
 		return
@@ -63,7 +68,7 @@ func getCharacter(c *gin.Context) {
 
 }
 
-func updateCharacter(c *gin.Context) {
+func updateCharacterRequest(c *gin.Context) {
 	id := c.Param("id")
 
 	var d struct {
@@ -81,7 +86,7 @@ func updateCharacter(c *gin.Context) {
 			*d.DiscoveryPercentage = math.Float32frombits(0x7F800000) // inf
 		}
 	}
-	f, err := os.Create(pwd + "/" + id + ".sav")
+	f, err := getSaveById(id)
 	if err != nil {
 		c.AbortWithStatus(500)
 		return
@@ -103,7 +108,7 @@ func listChar(id string) (char CharInfo, err error) {
 	if err != nil {
 		return
 	}
-	f, err := os.Open(pwd + "/" + id + ".sav")
+	f, err := getSaveById(id)
 	if err != nil {
 		return
 	}
@@ -112,4 +117,18 @@ func listChar(id string) (char CharInfo, err error) {
 	char.Name = *c.PreferredCharacterName
 	char.Experience = *c.ExperiencePoints
 	return
+}
+
+func getItems(c *gin.Context) {
+	id := c.Param("id")
+	f, err := getSaveById(id)
+	if err != nil {
+		c.AbortWithStatus(500)
+	}
+	_, char := character.Deserialize(f)
+	fmt.Println(char) // temp
+}
+
+func saveItems(c *gin.Context) {
+
 }

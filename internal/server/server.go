@@ -60,8 +60,8 @@ func Start() error {
 	r.POST("/profile", updateProfile)
 
 	r.GET("/characters", listCharacters)
-	r.GET("/characters/:id", getCharacter)
-	r.POST("/characters/:id", updateCharacter)
+	r.GET("/characters/:id", getCharacterRequest)
+	r.POST("/characters/:id", updateCharacterRequest)
 
 	return r.Run(":5050")
 }
