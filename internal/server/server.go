@@ -63,5 +63,7 @@ func Start() error {
 	r.GET("/characters/:id", getCharacterRequest)
 	r.POST("/characters/:id", updateCharacterRequest)
 
+	r.GET("/characters/:id/items", getItems)
+
 	return r.Run(":5050")
 }
