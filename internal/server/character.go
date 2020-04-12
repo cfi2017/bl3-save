@@ -1,13 +1,13 @@
 package server
 
 import (
-	"fmt"
 	"io/ioutil"
 	"math"
 	"os"
 	"regexp"
 	"strconv"
 
+	"github.com/cfi2017/bl3-save/internal/item"
 	"github.com/cfi2017/bl3-save/internal/shared"
 	"github.com/cfi2017/bl3-save/pkg/character"
 	"github.com/cfi2017/bl3-save/pkg/pb"
@@ -126,7 +126,18 @@ func getItems(c *gin.Context) {
 		c.AbortWithStatus(500)
 	}
 	_, char := character.Deserialize(f)
-	fmt.Println(char) // temp
+	items := make([]item.Item, len(char.InventoryItems))
+	for _, data := range char.InventoryItems {
+		i, err := item.Deserialize(data.ItemSerialNumber)
+		if err != nil {
+			c.AbortWithStatus(500)
+			return
+		}
+		i.Wrapper = data
+		items = append(items, i)
+	}
+	c.JSON(200, items)
+	return
 }
 
 func saveItems(c *gin.Context) {

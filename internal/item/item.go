@@ -11,6 +11,8 @@ import (
 	"log"
 	"strings"
 	"sync"
+
+	"github.com/cfi2017/bl3-save/pkg/pb"
 )
 
 var (
@@ -27,6 +29,8 @@ type Item struct {
 	Parts        []string
 	Generics     []string
 	Overflow     string
+	Version      uint64
+	Wrapper      *pb.OakInventoryItemSaveGameData
 }
 
 func DecryptSerial(data []byte) ([]byte, error) {
@@ -95,23 +99,29 @@ func Deserialize(data []byte) (item Item, err error) {
 		return
 	}
 
-	version := readNBits(r, 7)
+	item.Version = readNBits(r, 7)
 
-	item.Balance = getPart("InventoryBalanceData", version, r)
-	item.InvData = getPart("InventoryData", version, r)
-	item.Manufacturer = getPart("ManufacturerData", version, r)
+	item.Balance = getPart("InventoryBalanceData", readNBits(r,
+		getBits("InventoryBalanceData", item.Version))-1)
+	item.InvData = getPart("InventoryData", readNBits(r,
+		getBits("InventoryData", item.Version))-1)
+	item.Manufacturer = getPart("ManufacturerData", readNBits(r,
+		getBits("ManufacturerData", item.Version))-1)
 	item.Level = int(readNBits(r, 7))
 
 	if k, e := btik[strings.ToLower(item.Balance)]; e {
+		bits := db.GetData(k).GetBits(item.Version)
 		partCount := int(readNBits(r, 6))
 		item.Parts = make([]string, partCount)
 		for i := 0; i < partCount; i++ {
-			item.Parts[i] = getPart(k, version, r)
+			item.Parts[i] = getPart(k, readNBits(r, bits)-1)
 		}
 		genericCount := int(readNBits(r, 4))
 		item.Generics = make([]string, genericCount)
 		for i := 0; i < genericCount; i++ {
-			item.Generics[i] = getPart(k, version, r)
+			// looks like the bits are the same
+			// for all the parts and generics
+			item.Generics[i] = getPart(k, readNBits(r, bits)-1)
 		}
 		item.Overflow = r.Overflow()
 
@@ -122,10 +132,25 @@ func Deserialize(data []byte) (item Item, err error) {
 	return
 }
 
-func getPart(key string, version uint64, r *Reader) string {
+func getBits(k string, v uint64) int {
+	return db.GetData(k).GetBits(v)
+}
+
+/*func Serialize(item Item) []byte {
+	data := make([]byte, 0)
+	buffer := item.Overflow
+
+	if k, e := btik[strings.ToLower(item.Balance)]; e {
+		for i := len(item.Generics); i <= 0; i-- {
+			bits := getBits(k, item.Version)
+			item.Generics[i]
+		}
+	}
+
+}*/
+
+func getPart(key string, index uint64) string {
 	data := db.GetData(key)
-	bits := data.GetBits(version)
-	index := readNBits(r, bits) - 1
 	return data.GetPart(index)
 }
 
