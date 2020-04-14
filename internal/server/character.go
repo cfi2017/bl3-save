@@ -121,7 +121,7 @@ func listChar(id string) (char CharInfo, err error) {
 	return
 }
 
-func getItems(c *gin.Context) {
+func getItemsRequest(c *gin.Context) {
 	id := c.Param("id")
 	f, err := getSaveById(id)
 	if err != nil {
@@ -146,6 +146,45 @@ func getItems(c *gin.Context) {
 	return
 }
 
-func saveItems(c *gin.Context) {
+func updateItemsRequest(c *gin.Context) {
 
+	id := c.Param("id")
+	f, err := getSaveById(id)
+	if err != nil {
+		c.AbortWithStatus(500)
+		return
+	}
+	defer f.Close()
+	s, char := character.Deserialize(f)
+	var items []item.Item
+	err = c.BindJSON(&items)
+	if err != nil {
+		c.AbortWithStatus(500)
+		return
+	}
+	char.InventoryItems, err = itemsToPBArray(items)
+	if err != nil {
+		c.AbortWithStatus(500)
+		return
+	}
+	character.Serialize(f, s, char)
+	c.Status(204)
+	return
+
+}
+
+func itemsToPBArray(items []item.Item) ([]*pb.OakInventoryItemSaveGameData, error) {
+	result := make([]*pb.OakInventoryItemSaveGameData, len(items))
+	for index, i := range items {
+		result[index] = i.Wrapper
+		seed, err := item.GetSeedFromSerial(i.Wrapper.ItemSerialNumber)
+		if err != nil {
+			return nil, err
+		}
+		result[index].ItemSerialNumber, err = item.Serialize(i, seed)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return result, nil
 }

@@ -65,7 +65,7 @@ func EncryptSerial(data []byte, seed int32) ([]byte, error) {
 	binary.BigEndian.PutUint16(sumBytes, uint16(checksum))
 	data[5], data[6] = sumBytes[0], sumBytes[1] // set crc
 
-	return append(append([]byte{0x03}, seedBytes...), bogoDecrypt(seed, data[5:])...), nil
+	return append(append([]byte{0x03}, seedBytes...), bogoEncrypt(seed, data[5:])...), nil
 
 }
 

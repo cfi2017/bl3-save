@@ -58,7 +58,7 @@ func TestSerialize(t *testing.T) {
 		}
 		result := base64.StdEncoding.EncodeToString(bs)
 		if result != check {
-
+			panic("invalid serial")
 		}
 	}
 }
