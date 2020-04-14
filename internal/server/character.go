@@ -88,6 +88,7 @@ func updateCharacterRequest(c *gin.Context) {
 			*d.DiscoveryPercentage = math.Float32frombits(0x7F800000) // inf
 		}
 	}
+	backup(pwd, id)
 	f, err := getSaveById(id)
 	if err != nil {
 		c.AbortWithStatus(500)
@@ -162,6 +163,7 @@ func updateItemsRequest(c *gin.Context) {
 		c.AbortWithStatus(500)
 		return
 	}
+	backup(pwd, id)
 	char.InventoryItems, err = itemsToPBArray(items)
 	if err != nil {
 		c.AbortWithStatus(500)

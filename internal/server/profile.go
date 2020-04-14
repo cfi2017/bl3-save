@@ -33,6 +33,7 @@ func updateProfile(c *gin.Context) {
 		c.AbortWithStatus(500)
 		return
 	}
+	backup(pwd, "profile")
 	f, err := os.Create(pwd + "/profile.sav")
 	if err != nil {
 		c.AbortWithStatus(500)
