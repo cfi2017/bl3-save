@@ -152,7 +152,7 @@ func Deserialize(data []byte) (item Item, err error) {
 		for i := 0; i < genericCount; i++ {
 			// looks like the bits are the same
 			// for all the parts and generics
-			item.Generics[i] = getPart(k, readNBits(r, bits)-1)
+			item.Generics[i] = getPart("InventoryGenericPartData", readNBits(r, bits)-1)
 		}
 		item.Overflow = r.Overflow()
 
@@ -182,7 +182,7 @@ func Serialize(item Item, seed int32) ([]byte, error) {
 	if k, e := btik[strings.ToLower(item.Balance)]; e {
 		bits := getBits(k, item.Version)
 		for i := len(item.Generics) - 1; i >= 0; i-- {
-			err := w.WriteInt(getIndexFor(k, item.Generics[i])+1, bits)
+			err := w.WriteInt(getIndexFor("InventoryGenericPartData", item.Generics[i])+1, bits)
 			if err != nil {
 				panic(err)
 			}
