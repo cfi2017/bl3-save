@@ -67,6 +67,6 @@ func ReadNBytes(r io.Reader, n int) []byte {
 
 func WriteBytes(w io.Writer, bs []byte) {
 	if _, err := w.Write(bs); err != nil {
-		panic("failed to write")
+		panic(err)
 	}
 }
