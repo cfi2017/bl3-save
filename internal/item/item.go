@@ -52,6 +52,40 @@ func DecryptSerial(data []byte) ([]byte, error) {
 	return decrypted[2:], nil
 }
 
+func EncryptSerial(data []byte, seed int32) ([]byte, error) {
+	prefix := []byte{0x03}
+	seedBytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(seedBytes, uint32(seed))
+	prefix = append(prefix, seedBytes...)
+	prefix = append(prefix, 0xFF, 0xFF)
+	data = append(prefix, data...)
+	crc := crc32.ChecksumIEEE(data)
+	checksum := ((crc >> 16) ^ crc) & 0xFFFF
+	sumBytes := make([]byte, 2)
+	binary.BigEndian.PutUint16(sumBytes, uint16(checksum))
+	data[5], data[6] = sumBytes[0], sumBytes[1] // set crc
+
+	return append(append([]byte{0x03}, seedBytes...), bogoDecrypt(seed, data[5:])...), nil
+
+}
+
+func bogoEncrypt(seed int32, data []byte) []byte {
+	if seed == 0 {
+		return data
+	}
+
+	steps := int(seed&0x1F) % len(data)
+	data = append(data[steps:], data[:steps]...)
+	return xor(seed, data)
+}
+
+func GetSeedFromSerial(data []byte) (int32, error) {
+	if len(data) < 5 {
+		return 0, errors.New("invalid serial length")
+	}
+	return int32(binary.BigEndian.Uint32(data[1:])), nil
+}
+
 func bogoDecrypt(seed int32, data []byte) []byte {
 	if seed == 0 {
 		return data
@@ -133,18 +167,88 @@ func getBits(k string, v uint64) int {
 	return db.GetData(k).GetBits(v)
 }
 
-/*func Serialize(item Item) []byte {
-	data := make([]byte, 0)
-	buffer := item.Overflow
+func Serialize(item Item, seed int32) ([]byte, error) {
+	w := NewWriter(item.Overflow)
+	var err error
+
+	once.Do(func() {
+		btik, err = loadPartMap("balance_to_inv_key.json")
+		if err != nil {
+			return
+		}
+		db, err = loadPartsDatabase("inventory_raw.json")
+	})
 
 	if k, e := btik[strings.ToLower(item.Balance)]; e {
-		for i := len(item.Generics); i <= 0; i-- {
-			bits := getBits(k, item.Version)
-			item.Generics[i]
+		bits := getBits(k, item.Version)
+		for i := len(item.Generics) - 1; i >= 0; i-- {
+			err := w.WriteInt(getIndexFor(k, item.Generics[i])+1, bits)
+			if err != nil {
+				panic(err)
+			}
+		}
+		err := w.WriteInt(len(item.Generics), 4)
+		if err != nil {
+			panic(err)
+		}
+		for i := len(item.Parts) - 1; i >= 0; i-- {
+			err := w.WriteInt(getIndexFor(k, item.Parts[i])+1, bits)
+			if err != nil {
+				panic(err)
+			}
+		}
+		err = w.WriteInt(len(item.Parts), 6)
+		if err != nil {
+			panic(err)
 		}
 	}
 
-}*/
+	err = w.WriteInt(item.Level, 7)
+	if err != nil {
+		panic(err)
+	}
+
+	manIndex := getIndexFor("ManufacturerData", item.Manufacturer) + 1
+	manBits := getBits("ManufacturerData", item.Version)
+	err = w.WriteInt(manIndex, manBits)
+	if err != nil {
+		panic(err)
+	}
+	invIndex := getIndexFor("InventoryData", item.InvData) + 1
+	invBits := getBits("InventoryData", item.Version)
+	err = w.WriteInt(invIndex, invBits)
+	if err != nil {
+		panic(err)
+	}
+	balanceIndex := getIndexFor("InventoryBalanceData", item.Balance) + 1
+	balanceBits := getBits("InventoryBalanceData", item.Version)
+	err = w.WriteInt(balanceIndex, balanceBits)
+	if err != nil {
+		panic(err)
+	}
+
+	err = w.WriteInt(int(item.Version), 7)
+	if err != nil {
+		panic(err)
+	}
+
+	err = w.WriteInt(128, 8)
+	if err != nil {
+		panic(err)
+	}
+
+	return EncryptSerial(w.GetBytes(), seed)
+
+}
+
+func getIndexFor(k string, v string) int {
+	for i, asset := range db.GetData(k).Assets {
+		if asset == v {
+			return i
+		}
+	}
+	panic("no asset found while serializing")
+}
 
 func getPart(key string, index uint64) string {
 	data := db.GetData(key)

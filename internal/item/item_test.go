@@ -37,3 +37,28 @@ func TestDeserialize(t *testing.T) {
 		log.Println(item)
 	}
 }
+
+func TestSerialize(t *testing.T) {
+	for _, check := range checks {
+		bs, err := base64.StdEncoding.DecodeString(check)
+		if err != nil {
+			panic(err)
+		}
+		seed, err := GetSeedFromSerial(bs)
+		if err != nil {
+			panic(err)
+		}
+		item, err := Deserialize(bs)
+		if err != nil {
+			panic(err)
+		}
+		bs, err = Serialize(item, seed)
+		if err != nil {
+			panic(err)
+		}
+		result := base64.StdEncoding.EncodeToString(bs)
+		if result != check {
+
+		}
+	}
+}
