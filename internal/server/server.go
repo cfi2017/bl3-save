@@ -21,16 +21,20 @@ func Start(opts Options) error {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.LoggerWithWriter(os.Stderr, "/stats"), gin.Recovery())
-
-	r.Use(cors.New(cors.Config{
-		AllowAllOrigins:  opts.Insecure,
-		AllowOrigins:     []string{"https://bl3.swiss.dev", "http://localhost:4200"},
+	cfg := cors.Config{
 		AllowMethods:     []string{"GET", "POST"},
 		AllowHeaders:     []string{"Origin", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: false,
 		MaxAge:           12 * time.Hour,
-	}))
+	}
+
+	if opts.Insecure {
+		cfg.AllowAllOrigins = true
+	} else {
+		cfg.AllowOrigins = []string{"https://bl3.swiss.dev", "http://localhost:4200"}
+	}
+	r.Use(cors.New(cfg))
 
 	r.GET("/stats", func(c *gin.Context) {
 		_, err := os.Stat(pwd + "/profile.sav")
