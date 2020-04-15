@@ -62,7 +62,7 @@ func GetBtik() map[string]string {
 }
 
 func DecryptSerial(data []byte) ([]byte, error) {
-	if len(data) < 5 || len(data) > 40 {
+	if len(data) < 5 {
 		return nil, errors.New("invalid serial length")
 	}
 	if data[0] != 0x03 {

@@ -88,7 +88,6 @@ func gibbedToDm(i item.Item) DigitalMarineItem {
 	btik := item.GetBtik()
 	key := btik[strings.ToLower(i.Balance)]
 	m.Blueprint = getBlueprint(key, getPartSuffix(i.InvData))
-	// todo: second part of blueprint
 	for _, part := range i.Parts {
 		p := getPartSuffix(part)
 		found := false

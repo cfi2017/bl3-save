@@ -46,7 +46,7 @@ func (w *Writer) WriteInt(v, n int) error {
 
 func (w *Writer) GetBytes() []byte {
 	bs := make([]byte, 0)
-	for i := len(*w); i >= 8; i -= 8 {
+	for i := len(*w); i > 8; i -= 8 {
 		p := (*w)[i-8 : i]
 		i, err := strconv.ParseUint(string(p), 2, 8)
 		if err != nil {
