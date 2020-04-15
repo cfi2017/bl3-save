@@ -21,10 +21,8 @@ import (
 
 	"github.com/cfi2017/bl3-save/internal/server"
 	"github.com/cfi2017/bl3-save/internal/shared"
-	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
-
 	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
