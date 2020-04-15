@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -54,7 +55,12 @@ func getCharacterRequest(c *gin.Context) {
 	}
 	defer f.Close()
 	s, char := character.Deserialize(f)
-
+	// workaround for invalid json parsing values
+	for _, d := range char.GbxZoneMapFodSaveGameData.LevelData {
+		if d.DiscoveryPercentage > math.MaxFloat32 {
+			d.DiscoveryPercentage = -1
+		}
+	}
 	c.JSON(200, &struct {
 		Save      shared.SavFile `json:"save"`
 		Character pb.Character   `json:"character"`
@@ -73,6 +79,13 @@ func updateCharacterRequest(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatus(500)
 		return
+	}
+
+	// workaround for invalid json parsing values
+	for _, d := range d.Character.GbxZoneMapFodSaveGameData.LevelData {
+		if d.DiscoveryPercentage == -1 {
+			d.DiscoveryPercentage = math.Float32frombits(0x7F800000) // inf
+		}
 	}
 
 	backup(pwd, id)

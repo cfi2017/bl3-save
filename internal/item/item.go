@@ -31,6 +31,36 @@ type Item struct {
 	Wrapper      *pb.OakInventoryItemSaveGameData `json:"wrapper"`
 }
 
+func GetDB() PartsDatabase {
+	var err error
+	once.Do(func() {
+		btik, err = loadPartMap("balance_to_inv_key.json")
+		if err != nil {
+			return
+		}
+		db, err = loadPartsDatabase("inventory_raw.json")
+	})
+	if err != nil {
+		panic(err)
+	}
+	return db
+}
+
+func GetBtik() map[string]string {
+	var err error
+	once.Do(func() {
+		btik, err = loadPartMap("balance_to_inv_key.json")
+		if err != nil {
+			return
+		}
+		db, err = loadPartsDatabase("inventory_raw.json")
+	})
+	if err != nil {
+		panic(err)
+	}
+	return btik
+}
+
 func DecryptSerial(data []byte) ([]byte, error) {
 	if len(data) < 5 || len(data) > 40 {
 		return nil, errors.New("invalid serial length")
