@@ -89,7 +89,7 @@ func updateCharacterRequest(c *gin.Context) {
 	}
 
 	backup(pwd, id)
-	f, err := getSaveById(id)
+	f, err := os.Create(pwd + "/" + id + ".sav")
 	if err != nil {
 		c.AbortWithStatus(500)
 		return
