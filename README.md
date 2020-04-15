@@ -13,3 +13,5 @@ To get the utility, go to the releases page or run `go get github.com/cfi2017/bl
 
 **Make sure to make a backup before using this tool. The author takes no responsibility for any loss of progress as a result of this.**
 
+## Using
+Extract the files from the release into your Borderlands 3 Save directory. Run bl3-save.exe.
