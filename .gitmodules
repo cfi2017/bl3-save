@@ -1,3 +1,3 @@
 [submodule "protobuf"]
 	path = protobuf
-	url = https://github.com/gibbed/Borderlands3Protos
+	url = https://github.com/cfi2017/Borderlands3Protos
