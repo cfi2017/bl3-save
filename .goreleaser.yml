@@ -13,6 +13,11 @@ builds:
     - darwin
     - linux
     - windows
+    - js
+  goarch:
+    - amd64
+    - 386
+    - wasm
 archives:
 - replacements:
     darwin: Darwin
