@@ -17,12 +17,13 @@ func init() {
 	pwd, _ = os.Getwd()
 }
 
-func Start() error {
+func Start(opts Options) error {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.LoggerWithWriter(os.Stderr, "/stats"), gin.Recovery())
 
 	r.Use(cors.New(cors.Config{
+		AllowAllOrigins:  opts.Insecure,
 		AllowOrigins:     []string{"https://bl3.swiss.dev", "http://localhost:4200"},
 		AllowMethods:     []string{"GET", "POST"},
 		AllowHeaders:     []string{"Origin", "Content-Type"},
