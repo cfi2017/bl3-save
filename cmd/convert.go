@@ -27,12 +27,14 @@ var ConvertCmd = &cobra.Command{
 			// try deserializing item
 			i, err := item.Deserialize(bs)
 			if err != nil {
-				panic(err)
+				cmd.PrintErr("couldn't deserialize item")
+				return
 			}
 			// convert to dm item
 			bs, err = json.Marshal(item.GibbedToDm(i))
 			if err != nil {
-				panic(err)
+				cmd.PrintErr("couldn't convert item to dm format")
+				return
 			}
 			cmd.Print(base64.StdEncoding.EncodeToString(bs))
 			return

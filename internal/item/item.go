@@ -218,58 +218,58 @@ func Serialize(item Item, seed int32) ([]byte, error) {
 			err := w.WriteInt(index, bits)
 			if err != nil {
 				log.Printf("tried to fit index %v into %v bits for %s", index, bits, item.Generics[i])
-				panic(err)
+				return nil, err
 			}
 		}
 		err := w.WriteInt(len(item.Generics), 4)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		bits = getBits(k, item.Version)
 		for i := len(item.Parts) - 1; i >= 0; i-- {
 			err := w.WriteInt(getIndexFor(k, item.Parts[i])+1, bits)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 		}
 		err = w.WriteInt(len(item.Parts), 6)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 
 	err = w.WriteInt(item.Level, 7)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	manIndex := getIndexFor("ManufacturerData", item.Manufacturer) + 1
 	manBits := getBits("ManufacturerData", item.Version)
 	err = w.WriteInt(manIndex, manBits)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	invIndex := getIndexFor("InventoryData", item.InvData) + 1
 	invBits := getBits("InventoryData", item.Version)
 	err = w.WriteInt(invIndex, invBits)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	balanceIndex := getIndexFor("InventoryBalanceData", item.Balance) + 1
 	balanceBits := getBits("InventoryBalanceData", item.Version)
 	err = w.WriteInt(balanceIndex, balanceBits)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	err = w.WriteInt(int(item.Version), 7)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	err = w.WriteInt(128, 8)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	return EncryptSerial(w.GetBytes(), seed)
