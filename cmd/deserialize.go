@@ -93,8 +93,8 @@ Override with --format <profile|character>
 
 func init() {
 	rootCmd.AddCommand(DeserializeCmd)
-	deserializeCmd.PersistentFlags().StringVarP(&format, "format", "f", "", "format <isProfile|character>")
-	deserializeCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "json", "output <json>")
+	DeserializeCmd.PersistentFlags().StringVarP(&format, "format", "f", "", "format <isProfile|character>")
+	DeserializeCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "json", "output <json>")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
