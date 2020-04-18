@@ -12,6 +12,9 @@ type Reader struct {
 }
 
 func (r *Reader) ReadInt(n int) (uint64, error) {
+	if len(r.stream)-n < 0 {
+		n = len(r.stream)
+	}
 	val, err := strconv.ParseUint(r.stream[len(r.stream)-n:], 2, 64)
 	r.stream = r.stream[:len(r.stream)-n]
 	return val, err
