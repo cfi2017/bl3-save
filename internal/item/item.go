@@ -172,7 +172,7 @@ func Deserialize(data []byte) (item Item, err error) {
 	item.Level = int(readNBits(r, 7))
 
 	if k, e := btik[strings.ToLower(item.Balance)]; e {
-		bits := db.GetData(k).GetBits(item.Version)
+		bits := getBits(k, item.Version)
 		partCount := int(readNBits(r, 6))
 		item.Parts = make([]string, partCount)
 		for i := 0; i < partCount; i++ {
@@ -180,6 +180,7 @@ func Deserialize(data []byte) (item Item, err error) {
 		}
 		genericCount := int(readNBits(r, 4))
 		item.Generics = make([]string, genericCount)
+		bits = getBits("InventoryGenericPartData", item.Version)
 		for i := 0; i < genericCount; i++ {
 			// looks like the bits are the same
 			// for all the parts and generics
@@ -211,7 +212,7 @@ func Serialize(item Item, seed int32) ([]byte, error) {
 	})
 
 	if k, e := btik[strings.ToLower(item.Balance)]; e {
-		bits := getBits(k, item.Version)
+		bits := getBits("InventoryGenericPartData", item.Version)
 		for i := len(item.Generics) - 1; i >= 0; i-- {
 			index := getIndexFor("InventoryGenericPartData", item.Generics[i]) + 1
 			err := w.WriteInt(index, bits)
@@ -224,6 +225,7 @@ func Serialize(item Item, seed int32) ([]byte, error) {
 		if err != nil {
 			panic(err)
 		}
+		bits = getBits(k, item.Version)
 		for i := len(item.Parts) - 1; i >= 0; i-- {
 			err := w.WriteInt(getIndexFor(k, item.Parts[i])+1, bits)
 			if err != nil {
