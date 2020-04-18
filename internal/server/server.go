@@ -71,7 +71,7 @@ func Start(opts Options) error {
 	r.GET("/characters/:id/items", getItemsRequest)
 	r.POST("/characters/:id/items", updateItemsRequest)
 
-	r.GET("/convert", convertItem)
+	r.POST("/convert", convertItem)
 
 	return r.Run(":5050")
 }
