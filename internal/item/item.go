@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"hash/crc32"
 	"io/ioutil"
+	"log"
 	"strings"
 	"sync"
 
@@ -212,8 +213,10 @@ func Serialize(item Item, seed int32) ([]byte, error) {
 	if k, e := btik[strings.ToLower(item.Balance)]; e {
 		bits := getBits(k, item.Version)
 		for i := len(item.Generics) - 1; i >= 0; i-- {
-			err := w.WriteInt(getIndexFor("InventoryGenericPartData", item.Generics[i])+1, bits)
+			index := getIndexFor("InventoryGenericPartData", item.Generics[i]) + 1
+			err := w.WriteInt(index, bits)
 			if err != nil {
+				log.Printf("tried to fit index %v into %v bits for %s", index, bits, item.Generics[i])
 				panic(err)
 			}
 		}
