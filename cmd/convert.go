@@ -3,18 +3,20 @@ package cmd
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
+	"strings"
 
 	"github.com/cfi2017/bl3-save/internal/item"
 	"github.com/spf13/cobra"
 )
 
 // deserializeCmd represents the deserialize command
-var convertCmd = &cobra.Command{
+var ConvertCmd = &cobra.Command{
 	Use:   "convert",
 	Short: "Convert an item from gibbed to digital_marine or vice versa",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		args[0] = strings.TrimPrefix(args[0], "bl3(")
+		args[0] = strings.TrimSuffix(args[0], ")")
 		bs, err := base64.StdEncoding.DecodeString(args[0])
 		if err != nil {
 			panic(err)
@@ -32,20 +34,20 @@ var convertCmd = &cobra.Command{
 			if err != nil {
 				panic(err)
 			}
-			fmt.Print(base64.StdEncoding.EncodeToString(bs))
+			cmd.Print(base64.StdEncoding.EncodeToString(bs))
 			return
 		}
 		i := item.DmToGibbed(dmi)
 		bs, err = item.Serialize(i, 0) // encrypt with 0 seed
 		if err != nil {
-			panic(err)
+			cmd.Print("error decoding item. invalid serial?")
 		}
-		fmt.Printf("bl3(%s)", base64.StdEncoding.EncodeToString(bs))
+		cmd.Printf("bl3(%s)", base64.StdEncoding.EncodeToString(bs))
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(convertCmd)
+	rootCmd.AddCommand(ConvertCmd)
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

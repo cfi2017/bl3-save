@@ -35,7 +35,7 @@ var (
 )
 
 // deserializeCmd represents the deserialize command
-var deserializeCmd = &cobra.Command{
+var DeserializeCmd = &cobra.Command{
 	Use:   "deserialize",
 	Short: "Deserialize a .sav file.",
 	Long: `Deserialize a .sav file.
@@ -92,7 +92,7 @@ Override with --format <profile|character>
 }
 
 func init() {
-	rootCmd.AddCommand(deserializeCmd)
+	rootCmd.AddCommand(DeserializeCmd)
 	deserializeCmd.PersistentFlags().StringVarP(&format, "format", "f", "", "format <isProfile|character>")
 	deserializeCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "json", "output <json>")
 	// Here you will define your flags and configuration settings.
