@@ -178,10 +178,10 @@ func Deserialize(data []byte) (item Item, err error) {
 		for i := 0; i < partCount; i++ {
 			item.Parts[i] = getPart(k, readNBits(r, bits)-1)
 		}
-		genericCount := int(readNBits(r, 4))
+		genericCount := readNBits(r, 4)
 		item.Generics = make([]string, genericCount)
 		bits = getBits("InventoryGenericPartData", item.Version)
-		for i := 0; i < genericCount; i++ {
+		for i := 0; i < int(genericCount); i++ {
 			// looks like the bits are the same
 			// for all the parts and generics
 			item.Generics[i] = getPart("InventoryGenericPartData", readNBits(r, bits)-1)

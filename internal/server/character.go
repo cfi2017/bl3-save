@@ -133,6 +133,7 @@ func getItemsRequest(c *gin.Context) {
 	for _, data := range char.InventoryItems {
 		d := make([]byte, len(data.ItemSerialNumber))
 		copy(d, data.ItemSerialNumber)
+		log.Println(base64.StdEncoding.EncodeToString(data.ItemSerialNumber))
 		i, err := item.Deserialize(d)
 		if err != nil {
 			log.Println(err)

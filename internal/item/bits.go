@@ -11,9 +11,11 @@ type Reader struct {
 	stream string
 }
 
+var ErrOutOfRange = errors.New("error: out of range")
+
 func (r *Reader) ReadInt(n int) (uint64, error) {
-	if len(r.stream)-n < 0 {
-		n = len(r.stream)
+	if len(r.stream) < n {
+		return 0, ErrOutOfRange
 	}
 	val, err := strconv.ParseUint(r.stream[len(r.stream)-n:], 2, 64)
 	r.stream = r.stream[:len(r.stream)-n]
@@ -49,17 +51,12 @@ func (w *Writer) WriteInt(v, n int) error {
 
 func (w *Writer) GetBytes() []byte {
 	bs := make([]byte, 0)
-	for i := len(*w); i > 8; i -= 8 {
-		p := (*w)[i-8 : i]
-		i, err := strconv.ParseUint(string(p), 2, 8)
-		if err != nil {
-			panic(err)
-		}
-		bs = append(bs, byte(i))
+	padding := (8 - len(*w)) % 8
+	for i := 0; i < padding; i++ {
+		*w = "0" + *w
 	}
-	if len(*w)%8 > 0 {
-		p := (*w)[:len(*w)%8]
-		i, err := strconv.ParseInt(string(p), 2, 8)
+	for i := len(*w)/8 - 1; i > -1; i-- {
+		i, err := strconv.ParseUint(string((*w)[i*8:i*8+8]), 2, 8)
 		if err != nil {
 			panic(err)
 		}
