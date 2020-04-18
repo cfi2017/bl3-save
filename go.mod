@@ -11,7 +11,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/spf13/cobra v0.0.7
 	github.com/spf13/viper v1.6.2
-	github.com/stretchr/testify v1.4.0
 	golang.org/x/sys v0.0.0-20200408040146-ea54a3c99b9b // indirect
 	google.golang.org/protobuf v1.20.1
 	gopkg.in/yaml.v2 v2.2.8
