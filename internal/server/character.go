@@ -193,6 +193,10 @@ func itemsToPBArray(items []item.Item) ([]*pb.OakInventoryItemSaveGameData, erro
 		if err != nil {
 			return nil, err
 		}
+		if i.Balance == "" {
+			// sanity check, if the balance is empty, just write the original item back
+			continue
+		}
 		result[index].ItemSerialNumber, err = item.Serialize(i, seed)
 		if err != nil {
 			return nil, err
