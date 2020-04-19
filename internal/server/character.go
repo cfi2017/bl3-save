@@ -20,6 +20,12 @@ var (
 	charPattern = regexp.MustCompile("(\\d+)\\.sav")
 )
 
+type ItemRequest struct {
+	Items    []item.Item                         `json:"items"`
+	Equipped []*pb.EquippedInventorySaveGameData `json:"equipped"`
+	Active   []int32                             `json:"active"`
+}
+
 func listCharacters(c *gin.Context) {
 	files, err := ioutil.ReadDir(pwd)
 	if err != nil {
@@ -133,7 +139,6 @@ func getItemsRequest(c *gin.Context) {
 	for _, data := range char.InventoryItems {
 		d := make([]byte, len(data.ItemSerialNumber))
 		copy(d, data.ItemSerialNumber)
-		log.Println(base64.StdEncoding.EncodeToString(data.ItemSerialNumber))
 		i, err := item.Deserialize(d)
 		if err != nil {
 			log.Println(err)
@@ -144,7 +149,12 @@ func getItemsRequest(c *gin.Context) {
 		i.Wrapper = data
 		items = append(items, i)
 	}
-	c.JSON(200, &items)
+	ir := ItemRequest{
+		Items:    items,
+		Equipped: char.EquippedInventoryList,
+		Active:   char.ActiveWeaponList,
+	}
+	c.JSON(200, &ir)
 	return
 }
 
@@ -162,18 +172,20 @@ func updateItemsRequest(c *gin.Context) {
 		c.AbortWithStatus(500)
 		return
 	}
-	var items []item.Item
-	err = c.BindJSON(&items)
+	var ir ItemRequest
+	err = c.BindJSON(&ir)
 	if err != nil {
 		c.AbortWithStatus(500)
 		return
 	}
 	backup(pwd, id)
-	char.InventoryItems, err = itemsToPBArray(items)
+	char.InventoryItems, err = itemsToPBArray(ir.Items)
 	if err != nil {
 		c.AbortWithStatus(500)
 		return
 	}
+	char.ActiveWeaponList = ir.Active
+	char.EquippedInventoryList = ir.Equipped
 	f, err = os.Create(pwd + "/" + id + ".sav")
 	if err != nil {
 		c.AbortWithStatus(500)
