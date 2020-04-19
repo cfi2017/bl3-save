@@ -10,7 +10,11 @@ import (
 )
 
 var (
-	pwd string
+	pwd          string
+	BuildVersion = ""
+	BuildCommit  = ""
+	BuildDate    = ""
+	BuiltBy      = ""
 )
 
 func init() {
@@ -39,11 +43,19 @@ func Start(opts Options) error {
 	r.GET("/stats", func(c *gin.Context) {
 		_, err := os.Stat(pwd + "/profile.sav")
 		c.JSON(200, &struct {
-			Pwd        string `json:"pwd"`
-			HasProfile bool   `json:"hasProfile"`
+			Pwd          string `json:"pwd"`
+			HasProfile   bool   `json:"hasProfile"`
+			BuildVersion string `json:"buildVersion"`
+			BuildCommit  string `json:"buildCommit"`
+			BuildDate    string `json:"buildDate"`
+			BuiltBy      string `json:"builtBy"`
 		}{
-			Pwd:        pwd,
-			HasProfile: err == nil && !os.IsNotExist(err),
+			Pwd:          pwd,
+			HasProfile:   err == nil && !os.IsNotExist(err),
+			BuildVersion: BuildVersion,
+			BuildCommit:  BuildCommit,
+			BuildDate:    BuildDate,
+			BuiltBy:      BuiltBy,
 		})
 	})
 

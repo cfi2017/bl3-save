@@ -17,10 +17,22 @@ package main
 
 import (
 	"github.com/cfi2017/bl3-save/cmd"
+	"github.com/cfi2017/bl3-save/internal/server"
 	"github.com/spf13/cobra"
 )
 
+var (
+	version = "v0.0.0-dev"
+	commit  = ""
+	date    = ""
+	builtBy = "local"
+)
+
 func main() {
+	server.BuildVersion = version
+	server.BuildCommit = commit
+	server.BuildDate = date
+	server.BuiltBy = builtBy
 	cobra.MousetrapHelpText = ""
 	cmd.Execute()
 }
