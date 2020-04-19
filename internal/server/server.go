@@ -75,6 +75,8 @@ func Start(opts Options) error {
 
 	r.GET("/profile", getProfile)
 	r.POST("/profile", updateProfile)
+	r.GET("/profile/bank", getBankRequest)
+	r.POST("/profile/bank", updateBankRequest)
 
 	r.GET("/characters", listCharacters)
 	r.GET("/characters/:id", getCharacterRequest)

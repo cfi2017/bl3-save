@@ -191,6 +191,7 @@ func updateItemsRequest(c *gin.Context) {
 		c.AbortWithStatus(500)
 		return
 	}
+	defer f.Close()
 	character.Serialize(f, s, char)
 	c.Status(204)
 	return

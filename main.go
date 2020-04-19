@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	version = "v0.0.0-dev"
+	version = "v100.0.0"
 	commit  = ""
 	date    = ""
 	builtBy = "local"
