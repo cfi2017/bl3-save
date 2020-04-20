@@ -83,8 +83,8 @@ func updateBankRequest(c *gin.Context) {
 		c.AbortWithStatus(500)
 		return
 	}
-	err = f.Close()
 	s, p := profile.Deserialize(f)
+	err = f.Close()
 	if err != nil {
 		c.AbortWithStatus(500)
 		return
