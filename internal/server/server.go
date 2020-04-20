@@ -17,10 +17,6 @@ var (
 	BuiltBy      = ""
 )
 
-func init() {
-	pwd, _ = os.Getwd()
-}
-
 func Start(opts Options) error {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
@@ -38,6 +34,7 @@ func Start(opts Options) error {
 	} else {
 		cfg.AllowOrigins = []string{"https://bl3.swiss.dev", "http://localhost:4200"}
 	}
+	pwd = opts.DefaultPwd
 	r.Use(cors.New(cfg))
 
 	r.GET("/stats", func(c *gin.Context) {

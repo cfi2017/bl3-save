@@ -30,6 +30,7 @@ var cfgFile string
 
 var (
 	insecure bool
+	defaultPwd string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -48,6 +49,7 @@ to quickly create a Cobra application.`,
 		shared.OpenBrowser("https://bl3.swiss.dev/")
 		opts := server.Options{}
 		opts.Insecure = insecure
+		opts.DefaultPwd = defaultPwd
 		if err := server.Start(opts); err != nil {
 			panic(err)
 		}
@@ -74,6 +76,8 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolVar(&insecure, "insecure", false, "Run server without cors protection")
+	var currentPwd, _ = os.Getwd()
+	rootCmd.Flags().StringVar(&defaultPwd, "path", currentPwd, "Path to save file directory")
 }
 
 // initConfig reads in config file and ENV variables if set.
