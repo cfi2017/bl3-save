@@ -58,8 +58,10 @@ func (w *Writer) WriteInt(v uint64, n int) error {
 func (w *Writer) GetBytes() []byte {
 	bs := make([]byte, 0)
 	padding := 8 - len(*w)%8
-	for i := 0; i < padding; i++ {
-		*w = "0" + *w
+	if padding != 8 {
+		for i := 0; i < padding; i++ {
+			*w = "0" + *w
+		}
 	}
 	for i := len(*w)/8 - 1; i > -1; i-- {
 		i, err := strconv.ParseUint(string((*w)[i*8:i*8+8]), 2, 8)
