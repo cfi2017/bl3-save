@@ -1,6 +1,7 @@
 package item
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"math"
@@ -40,18 +41,23 @@ func NewReader(data []byte) *Reader {
 
 type Writer string
 
-func (w *Writer) WriteInt(v, n int) error {
+func (w *Writer) WriteInt(v uint64, n int) error {
 	if float64(v) >= math.Pow(2, float64(n)) {
 		return errors.New("invalid value exceeds requested length")
 	}
-	r := fmt.Sprintf("%0"+strconv.Itoa(n)+"b", v)
-	*w = *w + Writer(r)
+	bs := make([]byte, 8)
+	binary.BigEndian.PutUint64(bs, v)
+	var text string
+	for _, b := range bs {
+		text += fmt.Sprintf("%08b", b)
+	}
+	*w = *w + Writer(text[len(text)-n:])
 	return nil
 }
 
 func (w *Writer) GetBytes() []byte {
 	bs := make([]byte, 0)
-	padding := (8 - len(*w)) % 8
+	padding := 8 - len(*w)%8
 	for i := 0; i < padding; i++ {
 		*w = "0" + *w
 	}

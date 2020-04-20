@@ -15,9 +15,10 @@ import (
 )
 
 var (
-	db   PartsDatabase
-	btik map[string]string
-	once = sync.Once{}
+	db    PartsDatabase
+	btik  map[string]string
+	once  = sync.Once{}
+	debug bool
 )
 
 type Item struct {
@@ -163,12 +164,22 @@ func Deserialize(data []byte) (item Item, err error) {
 
 	item.Version = readNBits(r, 7)
 
+	balanceBits := getBits("InventoryBalanceData", item.Version)
+	invDataBits := getBits("InventoryData", item.Version)
+	manBits := getBits("ManufacturerData", item.Version)
+
+	if debug {
+		log.Printf("Got version: %v - balance bits: %v, invdata bits: %v, man bits: %v\n",
+			item.Version, balanceBits, invDataBits, manBits,
+		)
+	}
+
 	item.Balance = getPart("InventoryBalanceData", readNBits(r,
-		getBits("InventoryBalanceData", item.Version))-1)
+		balanceBits)-1)
 	item.InvData = getPart("InventoryData", readNBits(r,
-		getBits("InventoryData", item.Version))-1)
+		invDataBits)-1)
 	item.Manufacturer = getPart("ManufacturerData", readNBits(r,
-		getBits("ManufacturerData", item.Version))-1)
+		manBits)-1)
 	item.Level = int(readNBits(r, 7))
 
 	if k, e := btik[strings.ToLower(item.Balance)]; e {
@@ -211,58 +222,65 @@ func Serialize(item Item, seed int32) ([]byte, error) {
 		db, err = loadPartsDatabase("inventory_raw.json")
 	})
 
-	if k, e := btik[strings.ToLower(item.Balance)]; e {
-		bits := getBits("InventoryGenericPartData", item.Version)
-		for i := len(item.Generics) - 1; i >= 0; i-- {
-			index := getIndexFor("InventoryGenericPartData", item.Generics[i]) + 1
-			err := w.WriteInt(index, bits)
-			if err != nil {
-				log.Printf("tried to fit index %v into %v bits for %s", index, bits, item.Generics[i])
-				return nil, err
-			}
-		}
-		err := w.WriteInt(len(item.Generics), 4)
+	// how many bits for each generic part?
+	bits := getBits("InventoryGenericPartData", item.Version)
+
+	// write each generic, bottom to top
+	for i := len(item.Generics) - 1; i >= 0; i-- {
+		index := getIndexFor("InventoryGenericPartData", item.Generics[i]) + 1
+		err := w.WriteInt(uint64(index), bits)
 		if err != nil {
+			log.Printf("tried to fit index %v into %v bits for %s", index, bits, item.Generics[i])
 			return nil, err
 		}
+	}
+	// write generic count
+	err = w.WriteInt(uint64(len(item.Generics)), 4)
+	if err != nil {
+		return nil, err
+	}
+	if k, e := btik[strings.ToLower(item.Balance)]; e {
+		// how many bits per part?
 		bits = getBits(k, item.Version)
+		// write each part, bottom to top
 		for i := len(item.Parts) - 1; i >= 0; i-- {
-			err := w.WriteInt(getIndexFor(k, item.Parts[i])+1, bits)
+			err := w.WriteInt(uint64(getIndexFor(k, item.Parts[i]))+1, bits)
 			if err != nil {
 				return nil, err
 			}
 		}
-		err = w.WriteInt(len(item.Parts), 6)
+		// write part count
+		err = w.WriteInt(uint64(len(item.Parts)), 6)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	err = w.WriteInt(item.Level, 7)
+	err = w.WriteInt(uint64(item.Level), 7)
 	if err != nil {
 		return nil, err
 	}
 
 	manIndex := getIndexFor("ManufacturerData", item.Manufacturer) + 1
 	manBits := getBits("ManufacturerData", item.Version)
-	err = w.WriteInt(manIndex, manBits)
+	err = w.WriteInt(uint64(manIndex), manBits)
 	if err != nil {
 		return nil, err
 	}
 	invIndex := getIndexFor("InventoryData", item.InvData) + 1
 	invBits := getBits("InventoryData", item.Version)
-	err = w.WriteInt(invIndex, invBits)
+	err = w.WriteInt(uint64(invIndex), invBits)
 	if err != nil {
 		return nil, err
 	}
 	balanceIndex := getIndexFor("InventoryBalanceData", item.Balance) + 1
 	balanceBits := getBits("InventoryBalanceData", item.Version)
-	err = w.WriteInt(balanceIndex, balanceBits)
+	err = w.WriteInt(uint64(balanceIndex), balanceBits)
 	if err != nil {
 		return nil, err
 	}
 
-	err = w.WriteInt(int(item.Version), 7)
+	err = w.WriteInt(item.Version, 7)
 	if err != nil {
 		return nil, err
 	}
