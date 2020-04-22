@@ -27,7 +27,6 @@ archives:
     - LICENSE*
     - README*
     - CHANGELOG*
-    - "*.json"
   format_overrides:
     - goos: windows
       format: zip
