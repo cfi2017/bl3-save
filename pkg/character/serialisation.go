@@ -24,11 +24,14 @@ var (
 	}
 )
 
+func Decrypt(reader io.Reader) (shared.SavFile, []byte) {
+	s, data := shared.DeserializeHeader(reader)
+	return s, shared.Decrypt(data, prefixMagic, xorMagic)
+}
+
 func Deserialize(reader io.Reader) (shared.SavFile, pb.Character) {
 	// deserialise header, decrypt data
-	s, data := shared.DeserializeHeader(reader)
-
-	data = shared.Decrypt(data, prefixMagic, xorMagic)
+	s, data := Decrypt(reader)
 	p := pb.Character{}
 	if err := proto.Unmarshal(data, &p); err != nil {
 		panic("couldn't unmarshal protobuf data")

@@ -23,12 +23,14 @@ var (
 	}
 )
 
-func Deserialize(reader io.Reader) (shared.SavFile, pb.Profile) {
-
-	// deserialise header, decrypt data
+func Decrypt(reader io.Reader) (shared.SavFile, []byte) {
 	s, data := shared.DeserializeHeader(reader)
+	return s, shared.Decrypt(data, prefixMagic, xorMagic)
+}
 
-	data = shared.Decrypt(data, prefixMagic, xorMagic)
+func Deserialize(reader io.Reader) (shared.SavFile, pb.Profile) {
+	// deserialise header, decrypt data
+	s, data := Decrypt(reader)
 
 	p := pb.Profile{}
 	if err := proto.Unmarshal(data, &p); err != nil {
