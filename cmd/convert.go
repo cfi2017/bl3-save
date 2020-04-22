@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/cfi2017/bl3-save/internal/item"
+	"github.com/cfi2017/bl3-save-core/pkg/item"
 	"github.com/spf13/cobra"
 )
 

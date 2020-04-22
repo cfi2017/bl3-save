@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/cfi2017/bl3-save/pkg/character"
-	"github.com/cfi2017/bl3-save/pkg/profile"
+	"github.com/cfi2017/bl3-save-core/pkg/character"
+	"github.com/cfi2017/bl3-save-core/pkg/profile"
 	"github.com/spf13/cobra"
 )
 

@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/cfi2017/bl3-save-core/pkg/shared"
 	"github.com/cfi2017/bl3-save/internal/server"
-	"github.com/cfi2017/bl3-save/internal/shared"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -29,7 +29,7 @@ import (
 var cfgFile string
 
 var (
-	insecure bool
+	insecure   bool
 	defaultPwd string
 )
 

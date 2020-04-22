@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cfi2017/bl3-save/internal/shared"
-	character2 "github.com/cfi2017/bl3-save/pkg/character"
-	"github.com/cfi2017/bl3-save/pkg/pb"
-	profile2 "github.com/cfi2017/bl3-save/pkg/profile"
+	"github.com/cfi2017/bl3-save-core/pkg/character"
+	"github.com/cfi2017/bl3-save-core/pkg/pb"
+	"github.com/cfi2017/bl3-save-core/pkg/profile"
+	"github.com/cfi2017/bl3-save-core/pkg/shared"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 )
@@ -65,7 +65,7 @@ Override with --format <profile|character>
 		}
 
 		if isProfile {
-			s, p := profile2.Deserialize(f)
+			s, p := profile.Deserialize(f)
 			r := struct {
 				Sav     shared.SavFile
 				Profile pb.Profile
@@ -76,7 +76,7 @@ Override with --format <profile|character>
 			}
 			fmt.Print(string(bs))
 		} else {
-			s, c := character2.Deserialize(f)
+			s, c := character.Deserialize(f)
 			r := struct {
 				Sav       shared.SavFile
 				Character pb.Character

@@ -16,7 +16,9 @@ limitations under the License.
 package main
 
 import (
+	"github.com/cfi2017/bl3-save-core/pkg/assets"
 	"github.com/cfi2017/bl3-save/cmd"
+	assets2 "github.com/cfi2017/bl3-save/internal/assets"
 	"github.com/cfi2017/bl3-save/internal/server"
 	"github.com/spf13/cobra"
 )
@@ -29,6 +31,7 @@ var (
 )
 
 func main() {
+	assets.DefaultAssetLoader = assets2.HttpAssetsLoader{}
 	server.BuildVersion = version
 	server.BuildCommit = commit
 	server.BuildDate = date
