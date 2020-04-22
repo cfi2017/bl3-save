@@ -2,22 +2,17 @@ package item
 
 import (
 	"encoding/binary"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"hash/crc32"
-	"io/ioutil"
 	"log"
 	"strings"
-	"sync"
 
+	"github.com/cfi2017/bl3-save/internal/assets"
 	"github.com/cfi2017/bl3-save/pkg/pb"
 )
 
 var (
-	db    PartsDatabase
-	btik  map[string]string
-	once  = sync.Once{}
 	debug bool
 )
 
@@ -31,36 +26,6 @@ type Item struct {
 	Overflow     string                           `json:"overflow"`
 	Version      uint64                           `json:"version"`
 	Wrapper      *pb.OakInventoryItemSaveGameData `json:"wrapper"`
-}
-
-func GetDB() PartsDatabase {
-	var err error
-	once.Do(func() {
-		btik, err = loadPartMap("balance_to_inv_key.json")
-		if err != nil {
-			return
-		}
-		db, err = loadPartsDatabase("inventory_raw.json")
-	})
-	if err != nil {
-		panic(err)
-	}
-	return db
-}
-
-func GetBtik() map[string]string {
-	var err error
-	once.Do(func() {
-		btik, err = loadPartMap("balance_to_inv_key.json")
-		if err != nil {
-			return
-		}
-		db, err = loadPartsDatabase("inventory_raw.json")
-	})
-	if err != nil {
-		panic(err)
-	}
-	return btik
 }
 
 func DecryptSerial(data []byte) ([]byte, error) {
@@ -151,17 +116,6 @@ func Deserialize(data []byte) (item Item, err error) {
 		return
 	}
 
-	once.Do(func() {
-		btik, err = loadPartMap("balance_to_inv_key.json")
-		if err != nil {
-			return
-		}
-		db, err = loadPartsDatabase("inventory_raw.json")
-	})
-	if err != nil {
-		return
-	}
-
 	item.Version = readNBits(r, 7)
 
 	balanceBits := getBits("InventoryBalanceData", item.Version)
@@ -182,7 +136,7 @@ func Deserialize(data []byte) (item Item, err error) {
 		manBits)-1)
 	item.Level = int(readNBits(r, 7))
 
-	if k, e := btik[strings.ToLower(item.Balance)]; e {
+	if k, e := assets.GetBtik()[strings.ToLower(item.Balance)]; e {
 		bits := getBits(k, item.Version)
 		partCount := int(readNBits(r, 6))
 		item.Parts = make([]string, partCount)
@@ -207,20 +161,12 @@ func Deserialize(data []byte) (item Item, err error) {
 }
 
 func getBits(k string, v uint64) int {
-	return db.GetData(k).GetBits(v)
+	return assets.GetDB().GetData(k).GetBits(v)
 }
 
 func Serialize(item Item, seed int32) ([]byte, error) {
 	w := NewWriter(item.Overflow)
 	var err error
-
-	once.Do(func() {
-		btik, err = loadPartMap("balance_to_inv_key.json")
-		if err != nil {
-			return
-		}
-		db, err = loadPartsDatabase("inventory_raw.json")
-	})
 
 	// how many bits for each generic part?
 	bits := getBits("InventoryGenericPartData", item.Version)
@@ -239,7 +185,7 @@ func Serialize(item Item, seed int32) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if k, e := btik[strings.ToLower(item.Balance)]; e {
+	if k, e := assets.GetBtik()[strings.ToLower(item.Balance)]; e {
 		// how many bits per part?
 		bits = getBits(k, item.Version)
 		// write each part, bottom to top
@@ -295,7 +241,7 @@ func Serialize(item Item, seed int32) ([]byte, error) {
 }
 
 func getIndexFor(k string, v string) int {
-	for i, asset := range db.GetData(k).Assets {
+	for i, asset := range assets.GetDB().GetData(k).Assets {
 		if asset == v {
 			return i
 		}
@@ -304,7 +250,7 @@ func getIndexFor(k string, v string) int {
 }
 
 func getPart(key string, index uint64) string {
-	data := db.GetData(key)
+	data := assets.GetDB().GetData(key)
 	if int(index) >= len(data.Assets) {
 		return ""
 	}
@@ -317,22 +263,4 @@ func readNBits(r *Reader, n int) uint64 {
 		panic(err)
 	}
 	return i
-}
-
-func loadPartMap(file string) (m map[string]string, err error) {
-	bs, err := ioutil.ReadFile(file)
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(bs, &m)
-	return
-}
-
-func loadPartsDatabase(file string) (db PartsDatabase, err error) {
-	bs, err := ioutil.ReadFile(file)
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(bs, &db)
-	return
 }

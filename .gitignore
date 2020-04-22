@@ -2,3 +2,7 @@
 **/*.sav
 bl3-save
 **/pax
+
+assets/*
+**/*.exe
+**/*.txt

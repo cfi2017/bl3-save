@@ -1,4 +1,4 @@
-package item
+package assets
 
 type PartsDatabase map[string]Data
 

@@ -1,6 +1,10 @@
 package item
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/cfi2017/bl3-save/internal/assets"
+)
 
 type DigitalMarineItem struct {
 	CopyType       string   `json:"copyType"`
@@ -14,8 +18,8 @@ type DigitalMarineItem struct {
 
 func DmToGibbed(dmi DigitalMarineItem) Item {
 	i := Item{}
-	db := GetDB()
-	btik := GetBtik()
+	db := assets.GetDB()
+	btik := assets.GetBtik()
 	i.Balance = DmKeyToInvKey(dmi.Balance, db.GetData("InventoryBalanceData").Assets)
 	i.Manufacturer = DmKeyToInvKey(dmi.Manufacturer, db.GetData("ManufacturerData").Assets)
 	i.Level = dmi.Level
@@ -42,7 +46,7 @@ func GibbedToDm(i Item) DigitalMarineItem {
 	m.Level = i.Level
 	m.CopyType = "item"
 	m.Balance = GetPartSuffix(i.Balance)
-	btik := GetBtik()
+	btik := assets.GetBtik()
 	key := btik[strings.ToLower(i.Balance)]
 	m.Blueprint = GetBlueprint(key, GetPartSuffix(i.InvData))
 	for _, part := range i.Parts {
