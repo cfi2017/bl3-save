@@ -1,5 +1,6 @@
 [![GoDoc](https://godoc.org/github.com/cfi2017/bl3-save?status.svg)](https://godoc.org/github.com/cfi2017/bl3-save)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cfi2017/bl3-save)](https://goreportcard.com/report/github.com/cfi2017/bl3-save)
+![GitHub All Releases](https://img.shields.io/github/downloads/cfi2017/bl3-save/total)
 
 # bl3-save
 
