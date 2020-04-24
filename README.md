@@ -31,3 +31,15 @@ Credits go to these amazing people for all various sorts of reasons:
 
 ### Bug hunters
 - Zydiz
+
+## Other Tools
+
+There are a plethora of modding tools out there by now, 
+here are some select few that drew my attention while working on this project:
+- [Apocalyptech's Commandline Editor](https://github.com/apocalyptech/bl3-cli-saveedit)
+- [BaySix' Web Based Editor](https://www.bl3editor.com)
+- [Digital_Marine's Memory Editor (Links to Discord)](https://discord.gg/38sDVpE)
+
+## Tool Comparison Chart
+
+todo
