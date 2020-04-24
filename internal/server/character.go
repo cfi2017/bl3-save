@@ -7,7 +7,6 @@ import (
 	"math"
 	"os"
 	"regexp"
-	"strconv"
 
 	"github.com/cfi2017/bl3-save-core/pkg/character"
 	"github.com/cfi2017/bl3-save-core/pkg/item"
@@ -17,7 +16,7 @@ import (
 )
 
 var (
-	charPattern = regexp.MustCompile("(\\d+)\\.sav")
+	charPattern = regexp.MustCompile("^([0-9a-f]+)\\.sav$")
 )
 
 type ItemRequest struct {
@@ -37,6 +36,7 @@ func listCharacters(c *gin.Context) {
 		if !i.IsDir() && charPattern.MatchString(i.Name()) {
 			char, err := listChar(charPattern.FindStringSubmatch(i.Name())[1])
 			if err != nil {
+				log.Println(err)
 				c.AbortWithStatus(500)
 				return
 			}
@@ -107,17 +107,14 @@ func updateCharacterRequest(c *gin.Context) {
 }
 
 type CharInfo struct {
-	ID         int    `json:"id"`
+	ID         string `json:"id"`
 	Name       string `json:"name"`
 	Experience int32  `json:"experience"`
 }
 
 func listChar(id string) (char CharInfo, err error) {
-	char.ID, err = strconv.Atoi(id)
-	if err != nil {
-		return
-	}
 	f, err := getSaveById(id)
+	char.ID = id
 	if err != nil {
 		return
 	}
