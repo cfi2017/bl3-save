@@ -16,6 +16,7 @@ func convertItem(c *gin.Context) {
 	var request struct {
 		Base64 string `json:"base64"`
 	}
+	request.Base64 = strings.TrimSpace(request.Base64)
 	request.Base64 = strings.TrimPrefix(request.Base64, "bl3(")
 	request.Base64 = strings.TrimSuffix(request.Base64, ")")
 	err := c.BindJSON(&request)
