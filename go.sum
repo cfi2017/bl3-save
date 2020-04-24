@@ -14,6 +14,10 @@ github.com/cfi2017/bl3-save-core v0.0.0-20200422123544-dfb510565eb8 h1:JjOQQngeQ
 github.com/cfi2017/bl3-save-core v0.0.0-20200422123544-dfb510565eb8/go.mod h1:YV/PucmAhOAspofYbsys0dCm8qTAdsPPQuRvjjjjunM=
 github.com/cfi2017/bl3-save-core v0.0.0-20200422124636-8a38eb6480ff h1:porYzlzllFY4GnEUmGhJZPqnuEFlBQ/u4QBEI7qaZCk=
 github.com/cfi2017/bl3-save-core v0.0.0-20200422124636-8a38eb6480ff/go.mod h1:YV/PucmAhOAspofYbsys0dCm8qTAdsPPQuRvjjjjunM=
+github.com/cfi2017/bl3-save-core v1.0.0 h1:xha7AHkUMTkk7TTc1EtZ54Ki1tnerMZxeNxbitldaDI=
+github.com/cfi2017/bl3-save-core v1.0.0/go.mod h1:YV/PucmAhOAspofYbsys0dCm8qTAdsPPQuRvjjjjunM=
+github.com/cfi2017/bl3-save-core v1.0.1 h1:R2VdkxbKq8ahJ4KDVfYCRU46P0mSmnK5h0Ys4yGtg3Y=
+github.com/cfi2017/bl3-save-core v1.0.1/go.mod h1:YV/PucmAhOAspofYbsys0dCm8qTAdsPPQuRvjjjjunM=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/coreos/bbolt v1.3.2/go.mod h1:iRUV2dpdMOn7Bo10OQBFzIJO9kkE559Wcmn+qkEiiKk=
 github.com/coreos/etcd v3.3.10+incompatible/go.mod h1:uF7uidLiAD3TWHmW31ZFd/JWoc32PjwdhPthX9715RE=

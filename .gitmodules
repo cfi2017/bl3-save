@@ -1,3 +1,0 @@
-[submodule "protobuf"]
-	path = protobuf
-	url = github:cfi2017/Borderlands3Protos
