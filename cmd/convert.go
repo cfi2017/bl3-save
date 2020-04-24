@@ -88,6 +88,7 @@ type Anointments struct {
 
 func convert(arg string) (string, error) {
 	anoints := make([]string, 0)
+	arg = strings.TrimSpace(arg)
 	if parts := strings.Split(arg, " "); len(parts) > 1 {
 		var anointments Anointments
 		bs, err := base64.StdEncoding.DecodeString(parts[1])
