@@ -85,7 +85,7 @@ var ItemsCommand = &cobra.Command{
 				}
 				items[i] = parts[0]
 			}
-			if strings.HasPrefix(items[i], "bl3(") {
+			if strings.HasPrefix(items[i], "bl3(") || strings.HasPrefix(items[i], "BL3(") {
 				// assume bl3 format, verify and add
 			} else {
 				// try to convert base64
@@ -109,6 +109,7 @@ var ItemsCommand = &cobra.Command{
 			}
 
 			items[i] = strings.TrimPrefix(items[i], "bl3(")
+			items[i] = strings.TrimPrefix(items[i], "BL3(")
 			items[i] = strings.TrimSuffix(items[i], ")")
 
 			bs, err := base64.StdEncoding.DecodeString(items[i])

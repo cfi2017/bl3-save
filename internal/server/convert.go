@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/base64"
 	"encoding/json"
+	"log"
 	"strings"
 
 	"github.com/cfi2017/bl3-save-core/pkg/item"
@@ -19,11 +20,13 @@ func convertItem(c *gin.Context) {
 	request.Base64 = strings.TrimSuffix(request.Base64, ")")
 	err := c.BindJSON(&request)
 	if err != nil {
+		log.Println(err)
 		c.AbortWithStatusJSON(500, err)
 		return
 	}
 	bs, err := base64.StdEncoding.DecodeString(request.Base64)
 	if err != nil {
+		log.Println(err)
 		c.AbortWithStatusJSON(500, err)
 		return
 	}
@@ -33,6 +36,7 @@ func convertItem(c *gin.Context) {
 		// try deserializing item
 		i, err := item.Deserialize(bs)
 		if err != nil {
+			log.Println(err)
 			c.AbortWithStatusJSON(500, err)
 			return
 		}

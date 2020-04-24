@@ -105,6 +105,7 @@ func convert(arg string) (string, error) {
 		arg = parts[0]
 	}
 	arg = strings.TrimPrefix(arg, "bl3(")
+	arg = strings.TrimPrefix(arg, "BL3(")
 	arg = strings.TrimSuffix(arg, ")")
 	bs, err := base64.StdEncoding.DecodeString(arg)
 	if err != nil {
