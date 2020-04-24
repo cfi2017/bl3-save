@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	charPattern = regexp.MustCompile("^([0-9a-f]+)\\.sav$")
+	charPattern = regexp.MustCompile("^([0-9a-fA-F]+)\\.sav$")
 )
 
 type ItemRequest struct {
