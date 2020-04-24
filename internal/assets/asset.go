@@ -2,6 +2,7 @@ package assets
 
 import (
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -42,11 +43,12 @@ func downloadAsset(path, url string) error {
 	if err != nil {
 		return err
 	}
+	defer r.Body.Close()
 	if r.StatusCode == http.StatusNotModified {
 		// don't write in this case
 		return nil
 	}
-	defer r.Body.Close()
+	log.Printf("downloading newer version of asset to %s\n", path)
 	f, err := os.Create(path)
 	if err != nil {
 		return err
