@@ -19,7 +19,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/cfi2017/bl3-save-core/pkg/assets"
 	"github.com/cfi2017/bl3-save-core/pkg/shared"
+	assets2 "github.com/cfi2017/bl3-save/internal/assets"
 	"github.com/cfi2017/bl3-save/internal/server"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -29,8 +31,9 @@ import (
 var cfgFile string
 
 var (
-	insecure   bool
-	defaultPwd string
+	insecure        bool
+	defaultPwd      string
+	useCachedAssets bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -54,6 +57,13 @@ to quickly create a Cobra application.`,
 			panic(err)
 		}
 	},
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		if useCachedAssets {
+			assets.DefaultAssetLoader = assets.StaticFileAssetLoader{}
+		} else {
+			assets.DefaultAssetLoader = assets2.HttpAssetsLoader{}
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -72,6 +82,7 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.bl3-save.yaml)")
+	rootCmd.PersistentFlags().BoolVar(&useCachedAssets, "use-cached-assets", false, "force using cached assets")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

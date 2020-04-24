@@ -18,6 +18,7 @@ var (
 )
 
 type HttpAssetsLoader struct {
+	CacheDir string
 }
 
 func (h HttpAssetsLoader) GetDB() assets.PartsDatabase {
