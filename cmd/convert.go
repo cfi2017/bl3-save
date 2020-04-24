@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/cfi2017/bl3-save-core/pkg/assets"
 	"github.com/cfi2017/bl3-save-core/pkg/item"
@@ -27,7 +28,9 @@ var ConvertCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
 		queue := make(chan string)
+		done := sync.WaitGroup{}
 
+		done.Add(1)
 		go func() {
 			for literal := range queue {
 				c, err := convert(literal)
@@ -37,6 +40,7 @@ var ConvertCmd = &cobra.Command{
 				}
 				fmt.Println(c)
 			}
+			done.Done()
 		}()
 
 		for _, literal := range literals {
@@ -72,6 +76,7 @@ var ConvertCmd = &cobra.Command{
 			}
 		}
 		close(queue)
+		done.Wait()
 	},
 }
 
