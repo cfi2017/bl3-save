@@ -91,9 +91,9 @@ var ConvertCmd = &cobra.Command{
 }
 
 type Anointments struct {
-	CopyType       string
-	ComponentNames []string
-	Components     []int
+	CopyType       string   `json:"copyType"`
+	ComponentNames []string `json:"componentNames"`
+	Components     []int    `json:"components"`
 }
 
 func convert(arg string) (string, error) {
