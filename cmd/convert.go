@@ -106,7 +106,7 @@ func convert(arg string) (string, error) {
 			return "", err
 		}
 		err = json.Unmarshal(bs, &anointments)
-		if anointments.CopyType != "anointment" {
+		if anointments.CopyType != "anoinment" {
 			return "", errors.New("not a valid anointment code")
 		}
 		for _, i := range anointments.Components {
