@@ -112,6 +112,9 @@ func convert(arg string) (string, error) {
 		for _, i := range anointments.Components {
 			anoints = append(anoints, item.DmKeyToInvKey(anointments.ComponentNames[i],
 				assets.GetDB().GetData("InventoryGenericPartData").Assets))
+			if strings.Contains(anointments.ComponentNames[i], "WeaponMayhemLevel_11") {
+				anoints[len(anoints)-1] = "/Game/PatchDLC/Mayhem2/Gear/Weapon/_Shared/_Design/MayhemParts/Part_WeaponMayhemLevel_10.Part_WeaponMayhemLevel_10"
+			}
 		}
 		arg = parts[0]
 	}
