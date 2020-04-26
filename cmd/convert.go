@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -10,6 +11,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"unicode/utf8"
 
 	"github.com/cfi2017/bl3-save-core/pkg/assets"
 	"github.com/cfi2017/bl3-save-core/pkg/item"
@@ -25,8 +27,16 @@ var (
 var ConvertCmd = &cobra.Command{
 	Use:   "convert",
 	Short: "Convert an item from gibbed to digital_marine or vice versa",
-	Args:  cobra.ExactArgs(0),
+	Args:  cobra.MaximumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) > 0 {
+			if len(args) > 1 {
+				literals = append(literals, args[0]+" "+args[1])
+			} else {
+				literals = append(literals, args[0])
+			}
+		}
+
 		queue := make(chan string)
 		done := sync.WaitGroup{}
 
@@ -38,7 +48,7 @@ var ConvertCmd = &cobra.Command{
 					cmd.PrintErr(err)
 					return
 				}
-				fmt.Println(c)
+				cmd.Println(c)
 			}
 			done.Done()
 		}()
@@ -105,12 +115,18 @@ func convert(arg string) (string, error) {
 		}
 		arg = parts[0]
 	}
+	arg = strings.TrimSpace(arg)
 	arg = strings.TrimPrefix(arg, "bl3(")
 	arg = strings.TrimPrefix(arg, "BL3(")
 	arg = strings.TrimSuffix(arg, ")")
+	arg = string(bytes.TrimPrefix([]byte(arg), []byte{0xEF, 0xBB, 0xBF}))
 	bs, err := base64.StdEncoding.DecodeString(arg)
 	if err != nil {
-		panic(err)
+		arg = string(StringToAsciiBytes(arg))
+		bs, err = base64.StdEncoding.DecodeString(arg)
+		if err != nil {
+			panic(err)
+		}
 	}
 	var dmi item.DigitalMarineItem
 	err = json.Unmarshal(bs, &dmi)
@@ -139,6 +155,7 @@ func convert(arg string) (string, error) {
 }
 
 func init() {
+	ConvertCmd.SetOut(os.Stdout)
 	rootCmd.AddCommand(ConvertCmd)
 
 	ConvertCmd.PersistentFlags().StringSliceVar(&literals, "from-literal", []string{}, "literal code inputs")
@@ -152,4 +169,14 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// deserializeCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func StringToAsciiBytes(s string) []byte {
+	t := make([]byte, utf8.RuneCountInString(s))
+	i := 0
+	for _, r := range s {
+		t[i] = byte(r)
+		i++
+	}
+	return t
 }
