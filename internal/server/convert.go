@@ -17,15 +17,15 @@ func convertItem(c *gin.Context) {
 		Base64 string `json:"base64"`
 	}
 	err := c.BindJSON(&request)
-	request.Base64 = strings.TrimSpace(request.Base64)
-	request.Base64 = strings.TrimPrefix(request.Base64, "bl3(")
-	request.Base64 = strings.TrimPrefix(request.Base64, "BL3(")
-	request.Base64 = strings.TrimSuffix(request.Base64, ")")
 	if err != nil {
 		log.Println(err)
 		c.AbortWithStatusJSON(500, err)
 		return
 	}
+	request.Base64 = strings.TrimSpace(request.Base64)
+	request.Base64 = strings.TrimPrefix(request.Base64, "bl3(")
+	request.Base64 = strings.TrimPrefix(request.Base64, "BL3(")
+	request.Base64 = strings.TrimSuffix(request.Base64, ")")
 	bs, err := base64.StdEncoding.DecodeString(request.Base64)
 	if err != nil {
 		log.Println(err)
