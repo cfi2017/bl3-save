@@ -152,7 +152,7 @@ func convert(arg string) (string, error) {
 	i.Generics = append(i.Generics, anoints...)
 	bs, err = item.Serialize(i, 0) // encrypt with 0 seed
 	if err != nil {
-		return "", errors.New("error decoding item. invalid serial")
+		return "", err
 	}
 	return fmt.Sprintf("bl3(%s)", base64.StdEncoding.EncodeToString(bs)), nil
 }
