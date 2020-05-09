@@ -39,14 +39,20 @@ func convertItem(c *gin.Context) {
 		}
 		items := make([]item.Item, len(codes))
 		for index, code := range codes {
-			i, err := item.Deserialize(code)
+			bs, err := base64.StdEncoding.DecodeString(code)
 			if err != nil {
 				log.Println(err)
 				c.AbortWithStatusJSON(500, err)
 				return
 			}
+			i, err := item.Deserialize(bs)
+			if err != nil {
+				log.Printf("error in bl3(%s): %v", code, err)
+				c.AbortWithStatusJSON(500, err)
+				return
+			}
 			i.Wrapper = &pb.OakInventoryItemSaveGameData{
-				ItemSerialNumber:    code,
+				ItemSerialNumber:    bs,
 				PickupOrderIndex:    200,
 				Flags:               3,
 				WeaponSkinPath:      "",
@@ -81,15 +87,11 @@ func convertItem(c *gin.Context) {
 	return
 }
 
-func extractBL3Codes(text string) (codes [][]byte, err error) {
+func extractBL3Codes(text string) (codes []string, err error) {
 	matches := bl3CodeRegexp.FindAllStringSubmatch(text, -1)
-	codes = make([][]byte, len(matches))
+	codes = make([]string, len(matches))
 	for i, match := range matches {
-		bs, err := base64.StdEncoding.DecodeString(match[2])
-		if err != nil {
-			return nil, err
-		}
-		codes[i] = bs
+		codes[i] = match[2]
 	}
 	return
 }

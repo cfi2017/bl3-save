@@ -1,6 +1,8 @@
 package server
 
 import (
+	"encoding/base64"
+	"log"
 	"strings"
 	"testing"
 	"time"
@@ -21,6 +23,7 @@ func TestConvert(t *testing.T) {
 	// setup
 	assets.DefaultAssetLoader = assets2.HttpAssetsLoader{}
 	text := strings.Repeat(code, iterations)
+	text += "asdfasdf asdf\n some random stuff"
 	codes, err := extractBL3Codes(text)
 	if err != nil {
 		t.Fatal(err)
@@ -30,12 +33,16 @@ func TestConvert(t *testing.T) {
 
 	items := make([]item.Item, len(codes))
 	for index, code := range codes {
-		i, err := item.Deserialize(code)
+		bs, err := base64.StdEncoding.DecodeString(code)
+		if err != nil {
+			log.Fatal(err)
+		}
+		i, err := item.Deserialize(bs)
 		if err != nil {
 			t.Fatal(err)
 		}
 		i.Wrapper = &pb.OakInventoryItemSaveGameData{
-			ItemSerialNumber:    code,
+			ItemSerialNumber:    bs,
 			PickupOrderIndex:    200,
 			Flags:               3,
 			WeaponSkinPath:      "",
