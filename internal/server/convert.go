@@ -4,11 +4,16 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"log"
+	"regexp"
 	"strings"
 
 	"github.com/cfi2017/bl3-save-core/pkg/item"
 	"github.com/cfi2017/bl3-save-core/pkg/pb"
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	bl3CodeRegexp = regexp.MustCompile("(bl|BL)3\\(([A-Za-z0-9+/=]+)\\)")
 )
 
 func convertItem(c *gin.Context) {
@@ -23,9 +28,6 @@ func convertItem(c *gin.Context) {
 		return
 	}
 	request.Base64 = strings.TrimSpace(request.Base64)
-	request.Base64 = strings.TrimPrefix(request.Base64, "bl3(")
-	request.Base64 = strings.TrimPrefix(request.Base64, "BL3(")
-	request.Base64 = strings.TrimSuffix(request.Base64, ")")
 	bs, err := base64.StdEncoding.DecodeString(request.Base64)
 	if err != nil {
 		log.Println(err)
@@ -35,21 +37,31 @@ func convertItem(c *gin.Context) {
 	var dmi item.DigitalMarineItem
 	err = json.Unmarshal(bs, &dmi)
 	if err != nil {
-		// try deserializing item
-		i, err := item.Deserialize(bs)
+		// try extracting bl3 codes
+		codes, err := extractBL3Codes(request.Base64)
 		if err != nil {
 			log.Println(err)
 			c.AbortWithStatusJSON(500, err)
 			return
 		}
-		i.Wrapper = &pb.OakInventoryItemSaveGameData{
-			ItemSerialNumber:    bs,
-			PickupOrderIndex:    200,
-			Flags:               3,
-			WeaponSkinPath:      "",
-			DevelopmentSaveData: nil,
+		items := make([]item.Item, len(codes))
+		for index, code := range codes {
+			i, err := item.Deserialize(code)
+			if err != nil {
+				log.Println(err)
+				c.AbortWithStatusJSON(500, err)
+				return
+			}
+			i.Wrapper = &pb.OakInventoryItemSaveGameData{
+				ItemSerialNumber:    code,
+				PickupOrderIndex:    200,
+				Flags:               3,
+				WeaponSkinPath:      "",
+				DevelopmentSaveData: nil,
+			}
+			items[index] = i
 		}
-		c.JSON(200, &i)
+		c.JSON(200, &items)
 		return
 	}
 	i := item.DmToGibbed(dmi)
@@ -65,6 +77,19 @@ func convertItem(c *gin.Context) {
 		WeaponSkinPath:      "",
 		DevelopmentSaveData: nil,
 	}
-	c.JSON(200, &i)
+	c.JSON(200, &[]item.Item{i})
+	return
+}
+
+func extractBL3Codes(text string) (codes [][]byte, err error) {
+	matches := bl3CodeRegexp.FindAllStringSubmatch(text, -1)
+	codes = make([][]byte, len(matches))
+	for i, match := range matches {
+		bs, err := base64.StdEncoding.DecodeString(match[2])
+		if err != nil {
+			return nil, err
+		}
+		codes[i] = bs
+	}
 	return
 }
