@@ -30,13 +30,6 @@ func convertItem(c *gin.Context) {
 	request.Base64 = strings.TrimSpace(request.Base64)
 	bs, err := base64.StdEncoding.DecodeString(request.Base64)
 	if err != nil {
-		log.Println(err)
-		c.AbortWithStatusJSON(500, err)
-		return
-	}
-	var dmi item.DigitalMarineItem
-	err = json.Unmarshal(bs, &dmi)
-	if err != nil {
 		// try extracting bl3 codes
 		codes, err := extractBL3Codes(request.Base64)
 		if err != nil {
@@ -62,6 +55,13 @@ func convertItem(c *gin.Context) {
 			items[index] = i
 		}
 		c.JSON(200, &items)
+		return
+	}
+	var dmi item.DigitalMarineItem
+	err = json.Unmarshal(bs, &dmi)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatusJSON(500, err)
 		return
 	}
 	i := item.DmToGibbed(dmi)
