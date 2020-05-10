@@ -160,25 +160,29 @@ func updateItemsRequest(c *gin.Context) {
 	id := c.Param("id")
 	f, err := getSaveById(id)
 	if err != nil {
-		c.AbortWithStatus(500)
+		log.Printf("error getting save: %v", err)
+		c.AbortWithStatusJSON(500, &err)
 		return
 	}
 	s, char := character.Deserialize(f)
 	err = f.Close()
 	if err != nil {
-		c.AbortWithStatus(500)
+		log.Printf("error deserializing save: %v", err)
+		c.AbortWithStatusJSON(500, &err)
 		return
 	}
 	var ir ItemRequest
 	err = c.BindJSON(&ir)
 	if err != nil {
-		c.AbortWithStatus(500)
+		log.Printf("error deserializing request json: %v", err)
+		c.AbortWithStatusJSON(500, &err)
 		return
 	}
 	backup(pwd, id)
 	char.InventoryItems, err = itemsToPBArray(ir.Items)
 	if err != nil {
-		c.AbortWithStatus(500)
+		log.Printf("error converting items to save format: %v", err)
+		c.AbortWithStatusJSON(500, &err)
 		return
 	}
 	char.ActiveWeaponList = ir.Active
@@ -201,7 +205,8 @@ func itemsToPBArray(items []item.Item) ([]*pb.OakInventoryItemSaveGameData, erro
 		result[index] = i.Wrapper
 		seed, err := item.GetSeedFromSerial(i.Wrapper.ItemSerialNumber)
 		if err != nil {
-			return nil, err
+			// set seed to be 0
+			seed = 0
 		}
 		if i.Balance == "" {
 			// sanity check, if the balance is empty, just write the original item back
