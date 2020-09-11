@@ -25,9 +25,9 @@ var DecryptCommand = &cobra.Command{
 		defer f.Close()
 		var d []byte
 		if fileType == "character" {
-			_, d = character.Decrypt(f)
+			_, d = character.Decrypt(f, character.PCMagic)
 		} else if fileType == "profile" {
-			_, d = profile.Decrypt(f)
+			_, d = profile.Decrypt(f, profile.PCMagic)
 		} else {
 			log.Fatalln("invalid file type")
 		}
