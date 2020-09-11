@@ -65,7 +65,10 @@ Override with --format <profile|character>
 		}
 
 		if isProfile {
-			s, p := profile.Deserialize(f)
+			s, p, err := profile.Deserialize(f, profile.PCMagic)
+			if err != nil {
+				panic(err)
+			}
 			r := struct {
 				Sav     shared.SavFile
 				Profile pb.Profile
@@ -76,7 +79,10 @@ Override with --format <profile|character>
 			}
 			fmt.Print(string(bs))
 		} else {
-			s, c := character.Deserialize(f)
+			s, c, err := character.Deserialize(f, character.PCMagic)
+			if err != nil {
+				panic(err)
+			}
 			r := struct {
 				Sav       shared.SavFile
 				Character pb.Character

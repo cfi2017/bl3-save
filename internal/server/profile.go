@@ -12,6 +12,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	platformsProfile = make(Platforms)
+)
+
+func init() {
+	platformsProfile["pc"] = profile.PCMagic
+}
+
 func getProfile(c *gin.Context) {
 	f, err := os.Open(pwd + "/profile.sav")
 	if err != nil {
@@ -19,7 +27,12 @@ func getProfile(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	s, p := profile.Deserialize(f)
+	s, p, err := profile.Deserialize(f, profile.PCMagic)
+	if err != nil {
+		log.Printf("error deserializing save: %v", err)
+		c.AbortWithStatusJSON(500, &err)
+		return
+	}
 	c.JSON(200, struct {
 		Save    shared.SavFile `json:"save"`
 		Profile pb.Profile     `json:"profile"`
@@ -43,7 +56,7 @@ func updateProfile(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	profile.Serialize(f, d.Save, d.Profile)
+	profile.Serialize(f, d.Save, d.Profile, profile.PCMagic)
 	c.Status(204)
 	return
 
@@ -56,7 +69,12 @@ func getBankRequest(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	_, p := profile.Deserialize(f)
+	_, p, err := profile.Deserialize(f, profile.PCMagic)
+	if err != nil {
+		log.Printf("error deserializing save: %v", err)
+		c.AbortWithStatusJSON(500, &err)
+		return
+	}
 	items := make([]item.Item, 0)
 	for _, data := range p.BankInventoryList {
 		d := make([]byte, len(data))
@@ -83,7 +101,12 @@ func updateBankRequest(c *gin.Context) {
 		c.AbortWithStatus(500)
 		return
 	}
-	s, p := profile.Deserialize(f)
+	s, p, err := profile.Deserialize(f, profile.PCMagic)
+	if err != nil {
+		log.Printf("error deserializing save: %v", err)
+		c.AbortWithStatusJSON(500, &err)
+		return
+	}
 	err = f.Close()
 	if err != nil {
 		c.AbortWithStatus(500)
@@ -107,7 +130,7 @@ func updateBankRequest(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	profile.Serialize(f, s, p)
+	profile.Serialize(f, s, p, profile.PCMagic)
 	c.Status(204)
 	return
 

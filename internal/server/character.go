@@ -16,13 +16,20 @@ import (
 )
 
 var (
-	charPattern = regexp.MustCompile("^([0-9a-fA-F]+)\\.sav$")
+	charPattern        = regexp.MustCompile("^([0-9a-fA-F]+)\\.sav$")
+	platformsCharacter = make(Platforms)
 )
+
+func init() {
+	platformsCharacter["pc"] = character.PCMagic
+	platformsCharacter["ps4"] = character.PS4Magic
+}
 
 type ItemRequest struct {
 	Items    []item.Item                         `json:"items"`
 	Equipped []*pb.EquippedInventorySaveGameData `json:"equipped"`
 	Active   []int32                             `json:"active"`
+	Platform string                              `json:"platform"`
 }
 
 func listCharacters(c *gin.Context) {
@@ -60,7 +67,12 @@ func getCharacterRequest(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	s, char := character.Deserialize(f)
+	s, char, platform, err := TryDeserialize(character.Deserialize, platformsCharacter, f)
+	if err != nil {
+		log.Printf("error deserializing save: %v", err)
+		c.AbortWithStatusJSON(500, &err)
+		return
+	}
 	// workaround for invalid json parsing values
 	for _, d := range char.GbxZoneMapFodSaveGameData.LevelData {
 		if d.DiscoveryPercentage > math.MaxFloat32 {
@@ -70,7 +82,8 @@ func getCharacterRequest(c *gin.Context) {
 	c.JSON(200, &struct {
 		Save      shared.SavFile `json:"save"`
 		Character pb.Character   `json:"character"`
-	}{Save: s, Character: char})
+		Platform  string         `json:"platform"`
+	}{Save: s, Character: char, Platform: platform})
 
 }
 
@@ -101,7 +114,7 @@ func updateCharacterRequest(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	character.Serialize(f, d.Save, d.Character)
+	character.Serialize(f, d.Save, d.Character, character.PCMagic)
 	c.Status(204)
 	return
 }
@@ -119,7 +132,10 @@ func listChar(id string) (char CharInfo, err error) {
 		return
 	}
 	defer f.Close()
-	_, c := character.Deserialize(f)
+	_, c, _, err := TryDeserialize(character.Deserialize, platformsCharacter, f)
+	if err != nil {
+		return
+	}
 	char.Name = c.PreferredCharacterName
 	char.Experience = c.ExperiencePoints
 	return
@@ -131,7 +147,12 @@ func getItemsRequest(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatus(500)
 	}
-	_, char := character.Deserialize(f)
+	_, char, platform, err := TryDeserialize(character.Deserialize, platformsCharacter, f)
+	if err != nil {
+		log.Printf("error deserializing save: %v", err)
+		c.AbortWithStatusJSON(500, &err)
+		return
+	}
 	items := make([]item.Item, 0)
 	for _, data := range char.InventoryItems {
 		d := make([]byte, len(data.ItemSerialNumber))
@@ -150,6 +171,7 @@ func getItemsRequest(c *gin.Context) {
 		Items:    items,
 		Equipped: char.EquippedInventoryList,
 		Active:   char.ActiveWeaponList,
+		Platform: platform,
 	}
 	c.JSON(200, &ir)
 	return
@@ -164,7 +186,12 @@ func updateItemsRequest(c *gin.Context) {
 		c.AbortWithStatusJSON(500, &err)
 		return
 	}
-	s, char := character.Deserialize(f)
+	s, char, err := character.Deserialize(f, character.PCMagic)
+	if err != nil {
+		log.Printf("error deserializing save: %v", err)
+		c.AbortWithStatusJSON(500, &err)
+		return
+	}
 	err = f.Close()
 	if err != nil {
 		log.Printf("error deserializing save: %v", err)
@@ -193,7 +220,7 @@ func updateItemsRequest(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	character.Serialize(f, s, char)
+	character.Serialize(f, s, char, character.PCMagic)
 	c.Status(204)
 	return
 
