@@ -59,7 +59,7 @@ to quickly create a Cobra application.`,
 	},
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if useCachedAssets {
-			assets.DefaultAssetLoader = assets.StaticFileAssetLoader{}
+			assets.DefaultAssetLoader = &assets.StaticFileAssetLoader{}
 		} else {
 			assets.DefaultAssetLoader = assets2.HttpAssetsLoader{}
 		}
