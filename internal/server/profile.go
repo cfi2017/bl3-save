@@ -46,13 +46,13 @@ func updateProfile(c *gin.Context) {
 	}
 	err := c.BindJSON(&d)
 	if err != nil {
-		c.AbortWithStatus(500)
+		_ = c.AbortWithError(500, err)
 		return
 	}
 	backup(pwd, "profile")
 	f, err := os.Create(pwd + "/profile.sav")
 	if err != nil {
-		c.AbortWithStatus(500)
+		_ = c.AbortWithError(500, err)
 		return
 	}
 	defer f.Close()
