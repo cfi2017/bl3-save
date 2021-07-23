@@ -2,15 +2,19 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/cfi2017/bl3-save)](https://goreportcard.com/report/github.com/cfi2017/bl3-save)
 ![GitHub All Releases](https://img.shields.io/github/downloads/cfi2017/bl3-save/total)
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I2I15DZCA)
+
 # bl3-save
 
 Command line utility for modifying borderlands 3 character and profile saves.
 
 ## Getting started
 
-To get the utility, go to the [releases](https://github.com/cfi2017/bl3-save/releases) page or run `go get github.com/cfi2017/bl3-save`.
+To get the utility, go to the [releases](https://github.com/cfi2017/bl3-save/releases) page or
+run `go get github.com/cfi2017/bl3-save`.
 
-**If you're using Steam, make sure to disable cloud synchronisation or Steam will overwrite your changes with your cloud save.**
+**If you're using Steam, make sure to disable cloud synchronisation or Steam will overwrite your changes with your cloud
+save.**
 
 **Make sure to make a backup before using this tool. The author takes no responsibility for any loss of progress as a result of this.**
 

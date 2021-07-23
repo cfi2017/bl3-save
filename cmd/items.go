@@ -29,7 +29,7 @@ var ItemsCommand = &cobra.Command{
 		if err != nil {
 			cmd.PrintErrf("couldn't open character: %v\n", err)
 		}
-		s, c, err := character.Deserialize(f, character.PCMagic)
+		s, c, err := character.Deserialize(f, "pc")
 		if err != nil {
 			cmd.PrintErr(err)
 			return
@@ -150,7 +150,7 @@ var ItemsCommand = &cobra.Command{
 		if err != nil {
 			cmd.PrintErrf("couldn't create character: %v\n", err)
 		}
-		character.Serialize(f, s, c, character.PCMagic)
+		character.Serialize(f, s, c, "pc")
 		err = f.Close()
 		if err != nil {
 			cmd.PrintErr(err)

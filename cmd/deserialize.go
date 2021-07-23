@@ -65,7 +65,7 @@ Override with --format <profile|character>
 		}
 
 		if isProfile {
-			s, p, err := profile.Deserialize(f, profile.PCMagic)
+			s, p, err := profile.Deserialize(f, "pc")
 			if err != nil {
 				panic(err)
 			}
@@ -79,7 +79,7 @@ Override with --format <profile|character>
 			}
 			fmt.Print(string(bs))
 		} else {
-			s, c, err := character.Deserialize(f, character.PCMagic)
+			s, c, err := character.Deserialize(f, "pc")
 			if err != nil {
 				panic(err)
 			}

@@ -12,14 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var (
-	platformsProfile = make(Platforms)
-)
-
-func init() {
-	platformsProfile["pc"] = profile.PCMagic
-}
-
 func getProfile(c *gin.Context) {
 	f, err := os.Open(pwd + "/profile.sav")
 	if err != nil {
@@ -27,7 +19,7 @@ func getProfile(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	s, p, err := profile.Deserialize(f, profile.PCMagic)
+	s, p, err := profile.Deserialize(f, "pc")
 	if err != nil {
 		log.Printf("error deserializing save: %v", err)
 		c.AbortWithStatusJSON(500, &err)
@@ -56,7 +48,7 @@ func updateProfile(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	profile.Serialize(f, d.Save, d.Profile, profile.PCMagic)
+	profile.Serialize(f, d.Save, d.Profile, "pc")
 	c.Status(204)
 	return
 
@@ -69,7 +61,7 @@ func getBankRequest(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	_, p, err := profile.Deserialize(f, profile.PCMagic)
+	_, p, err := profile.Deserialize(f, "pc")
 	if err != nil {
 		log.Printf("error deserializing save: %v", err)
 		c.AbortWithStatusJSON(500, &err)
@@ -101,7 +93,7 @@ func updateBankRequest(c *gin.Context) {
 		c.AbortWithStatus(500)
 		return
 	}
-	s, p, err := profile.Deserialize(f, profile.PCMagic)
+	s, p, err := profile.Deserialize(f, "pc")
 	if err != nil {
 		log.Printf("error deserializing save: %v", err)
 		c.AbortWithStatusJSON(500, &err)
@@ -130,7 +122,7 @@ func updateBankRequest(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	profile.Serialize(f, s, p, profile.PCMagic)
+	profile.Serialize(f, s, p, "pc")
 	c.Status(204)
 	return
 

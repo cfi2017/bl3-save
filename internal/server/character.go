@@ -16,14 +16,8 @@ import (
 )
 
 var (
-	charPattern        = regexp.MustCompile("^([0-9a-fA-F]+)\\.sav$")
-	platformsCharacter = make(Platforms)
+	charPattern = regexp.MustCompile("^([0-9a-fA-F]+)\\.sav$")
 )
-
-func init() {
-	platformsCharacter["pc"] = character.PCMagic
-	platformsCharacter["ps4"] = character.PS4Magic
-}
 
 type ItemRequest struct {
 	Items    []item.Item                         `json:"items"`
@@ -67,7 +61,7 @@ func getCharacterRequest(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	s, char, platform, err := TryDeserialize(character.Deserialize, platformsCharacter, f)
+	s, char, err := character.Deserialize(f, "pc")
 	if err != nil {
 		log.Printf("error deserializing save: %v", err)
 		c.AbortWithStatusJSON(500, &err)
@@ -83,7 +77,7 @@ func getCharacterRequest(c *gin.Context) {
 		Save      shared.SavFile `json:"save"`
 		Character pb.Character   `json:"character"`
 		Platform  string         `json:"platform"`
-	}{Save: s, Character: char, Platform: platform})
+	}{Save: s, Character: char, Platform: "pc"})
 
 }
 
@@ -114,7 +108,7 @@ func updateCharacterRequest(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	character.Serialize(f, d.Save, d.Character, character.PCMagic)
+	character.Serialize(f, d.Save, d.Character, "pc")
 	c.Status(204)
 	return
 }
@@ -132,7 +126,7 @@ func listChar(id string) (char CharInfo, err error) {
 		return
 	}
 	defer f.Close()
-	_, c, _, err := TryDeserialize(character.Deserialize, platformsCharacter, f)
+	_, c, err := character.Deserialize(f, "pc")
 	if err != nil {
 		return
 	}
@@ -147,7 +141,7 @@ func getItemsRequest(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatus(500)
 	}
-	_, char, platform, err := TryDeserialize(character.Deserialize, platformsCharacter, f)
+	_, char, err := character.Deserialize(f, "pc")
 	if err != nil {
 		log.Printf("error deserializing save: %v", err)
 		c.AbortWithStatusJSON(500, &err)
@@ -171,7 +165,7 @@ func getItemsRequest(c *gin.Context) {
 		Items:    items,
 		Equipped: char.EquippedInventoryList,
 		Active:   char.ActiveWeaponList,
-		Platform: platform,
+		Platform: "pc",
 	}
 	c.JSON(200, &ir)
 	return
@@ -186,7 +180,7 @@ func updateItemsRequest(c *gin.Context) {
 		c.AbortWithStatusJSON(500, &err)
 		return
 	}
-	s, char, err := character.Deserialize(f, character.PCMagic)
+	s, char, err := character.Deserialize(f, "pc")
 	if err != nil {
 		log.Printf("error deserializing save: %v", err)
 		c.AbortWithStatusJSON(500, &err)
@@ -220,7 +214,7 @@ func updateItemsRequest(c *gin.Context) {
 		return
 	}
 	defer f.Close()
-	character.Serialize(f, s, char, character.PCMagic)
+	character.Serialize(f, s, char, "pc")
 	c.Status(204)
 	return
 
