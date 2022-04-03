@@ -52,10 +52,10 @@ func convertItem(c *gin.Context) {
 				return
 			}
 			i.Wrapper = &pb.OakInventoryItemSaveGameData{
-				ItemSerialNumber:    bs,
-				PickupOrderIndex:    200,
-				Flags:               3,
-				WeaponSkinPath:      "",
+				ItemSerialNumber: bs,
+				PickupOrderIndex: 200,
+				Flags:            3,
+				// WeaponSkinPath:      "",
 				DevelopmentSaveData: nil,
 			}
 			items[index] = i
@@ -77,10 +77,10 @@ func convertItem(c *gin.Context) {
 		return
 	}
 	i.Wrapper = &pb.OakInventoryItemSaveGameData{
-		ItemSerialNumber:    bs,
-		PickupOrderIndex:    200,
-		Flags:               3,
-		WeaponSkinPath:      "",
+		ItemSerialNumber: bs,
+		PickupOrderIndex: 200,
+		Flags:            3,
+		// WeaponSkinPath:      "",
 		DevelopmentSaveData: nil,
 	}
 	c.JSON(200, &[]item.Item{i})

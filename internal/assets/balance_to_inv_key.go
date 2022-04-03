@@ -2,7 +2,6 @@ package assets
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -18,7 +17,7 @@ func GetBtik() map[string]string {
 	var err error
 	btikOnce.Do(func() {
 		_ = os.MkdirAll("assets", os.ModePerm)
-		err = downloadAsset("assets/balance_to_inv_key.json", fmt.Sprintf("%s/assets/balance_to_inv_key.json", publisher))
+		// err = downloadAsset("assets/balance_to_inv_key.json", fmt.Sprintf("%s/assets/balance_to_inv_key.json", publisher))
 		if err != nil {
 			log.Println("couldn't download fresh assets")
 		}

@@ -137,10 +137,10 @@ var ItemsCommand = &cobra.Command{
 				return
 			}
 			c.InventoryItems = append(c.InventoryItems, &pb.OakInventoryItemSaveGameData{
-				ItemSerialNumber:    bs,
-				PickupOrderIndex:    200, // set static, idk what this does
-				Flags:               1,   // flag 1 should be "new"
-				WeaponSkinPath:      "",  // no skin applied
+				ItemSerialNumber: bs,
+				PickupOrderIndex: 200, // set static, idk what this does
+				Flags:            1,   // flag 1 should be "new"
+				// WeaponSkinPath:      "",  // no skin applied
 				DevelopmentSaveData: nil,
 			})
 		}

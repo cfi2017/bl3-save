@@ -1,7 +1,6 @@
 package assets
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"sync"
@@ -18,7 +17,7 @@ func GetDB() assets.PartsDatabase {
 	var err error
 	dbOnce.Do(func() {
 		_ = os.MkdirAll("assets", os.ModePerm)
-		err = downloadAsset("assets/inventory_raw.json", fmt.Sprintf("%s/assets/inventory_raw.json", publisher))
+		// err = downloadAsset("assets/inventory_raw.json", fmt.Sprintf("%s/assets/inventory_raw.json", publisher))
 		if err != nil {
 			log.Println("couldn't download fresh assets")
 		}

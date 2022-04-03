@@ -69,18 +69,16 @@ func getBankRequest(c *gin.Context) {
 	}
 	items := make([]item.Item, 0)
 	for _, data := range p.BankInventoryList {
-		d := make([]byte, len(data))
-		copy(d, data)
+		d := make([]byte, len(data.ItemSerialNumber))
+		copy(d, data.ItemSerialNumber)
 		i, err := item.Deserialize(d)
 		if err != nil {
 			log.Println(err)
-			log.Println(base64.StdEncoding.EncodeToString(data))
+			log.Println(base64.StdEncoding.EncodeToString(data.ItemSerialNumber))
 			// c.AbortWithStatus(500)
 			// return
 		}
-		i.Wrapper = &pb.OakInventoryItemSaveGameData{
-			ItemSerialNumber: data,
-		}
+		i.Wrapper = data
 		items = append(items, i)
 	}
 	c.JSON(200, &items)
@@ -112,9 +110,9 @@ func updateBankRequest(c *gin.Context) {
 	}
 	backup(pwd, "profile")
 	pba, err := itemsToPBArray(items)
-	p.BankInventoryList = make([][]byte, len(pba))
+	p.BankInventoryList = make([]*pb.OakInventoryItemSaveGameData, len(pba))
 	for i := range pba {
-		p.BankInventoryList[i] = pba[i].ItemSerialNumber
+		p.BankInventoryList[i] = pba[i]
 	}
 	f, err = os.Create(pwd + "/profile.sav")
 	if err != nil {
